@@ -1,0 +1,1598 @@
+﻿<?xml version="1.0"?>
+<Package ObjectType="106" CSAOName="Package" CSAOCaption="TPackageFactory" Version="1.30">
+	<Id>{FA8D5471-F63A-4151-94EB-054BE0829E41}</Id>
+	<Name>Ozum Extras</Name>
+	<Ordinal>0</Ordinal>
+	<GlobalOrder>0</GlobalOrder>
+	<Description/>
+	<Version>1.47</Version>
+	<Basic>0</Basic>
+	<DontLoad>0</DontLoad>
+	<System>0</System>
+	<AutoIncrementVersion>0</AutoIncrementVersion>
+	<Language>---</Language>
+	<MultiDBPlatform>0</MultiDBPlatform>
+	<Scripts>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{B2A29940-A5B8-4E65-8736-187976168DDB}</Id>
+			<Name>array</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[/**
+ * Returns the index of the first occurrence of a value in an array.
+ * Mirrors Array.prototype.indexOf semantics but works in TDM's JScript host.
+ *
+ * @param {Array}  array          - Collection to search.
+ * @param {*}      searchElement  - Value to locate in the array.
+ * @param {number} [fromIndex=0]  - Starting index; negatives offset from the end.
+ *
+ * @returns {number} Zero-based index or -1 when the value is missing.
+ *
+ * @example
+ * // returns 2
+ * indexOf(['a', 'b', 'c'], 'c');
+ */
+function indexOf(array, searchElement, fromIndex) {
+  var start = fromIndex < 0 ? array.length + fromIndex : fromIndex;
+  for (var i = start || 0; i < array.length; i++)
+    if (array[i] === searchElement) return i;
+
+  return -1;
+}
+
+/**
+ * Creates a new array with elements that pass the predicate test.
+ * Mirrors Array.prototype.filter so legacy JScript macros can use the same API.
+ *
+ * @param {Array} array            - Source collection to iterate.
+ * @param {Function} predicate     - Callback invoked as predicate(element, index, array).
+ * @param {*} [thisArg]            - Optional value used as `this` inside the predicate.
+ * @returns {Array}                - New array containing items where predicate returned truthy.
+ *
+ * @example
+ * filter([1, 2, 3], function (value) { return value > 1; }); // [2, 3]
+ */
+function filter(array, predicate, thisArg) {
+  var result = [];
+  if (!array || typeof predicate !== "function") return result;
+  for (var i = 0; i < array.length; i++) {
+    if (!Object.prototype.hasOwnProperty.call(array, i)) continue;
+    if (predicate.call(thisArg, array[i], i, array)) result.push(array[i]);
+  }
+  return result;
+}
+
+/**
+ * Executes a provided function once for each array element.
+ * Mirrors Array.prototype.forEach so macros can avoid manual index loops.
+ *
+ * @param {Array} array            - Array to iterate.
+ * @param {Function} callback      - Invoked as callback(element, index, array) per item.
+ * @param {*} [thisArg]            - Optional value used as `this` inside the callback.
+ */
+function forEach(array, callback, thisArg) {
+  if (!array || typeof callback !== "function") return;
+  for (var i = 0; i < array.length; i++) {
+    if (!Object.prototype.hasOwnProperty.call(array, i)) continue;
+    callback.call(thisArg, array[i], i, array);
+  }
+}
+
+
+]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>array</Caption>
+			<Parent>
+				<Id>{FF8E8814-FCE5-423D-BDEA-814E9EF93456}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+			</Visibilities>
+		</Script>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{7C19CDAB-9CA8-445C-9EC9-0B308677ACC1}</Id>
+			<Name>fs</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[/**
+ * Ensures a directory exists before subsequent file operations run.
+ * Creates the target folder if it is missing (no-op when already present).
+ *
+ * @param {string} folderPath - Absolute or relative directory path to create when needed.
+ *
+ * @example
+ * createFolder("C:/tmp/sql");
+ */
+function createFolder(folderPath) {
+  var fso = toad.getFso();
+  if (!fso.folderExists(folderPath)) fso.createFolder(folderPath);
+}
+
+/**
+ * Reads subfolder names under the supplied directory.
+ * Supports returning either leaf names or absolute paths depending on the flag.
+ *
+ * @param {string}  folderPath              - Directory whose immediate subfolders will be enumerated.
+ * @param {boolean} [absolute=false]  - When true, returns absolute folder paths; otherwise just names.
+ * @returns {string[]} Ordered list of child folder names or paths.
+ *
+ * @example
+ * readFolderNames(App.Model.ModelFileDirectory, true);
+ */
+function readFolderNames(folderPath, absolute) {
+  var fso = toad.getFso();
+  var subfolderCollection = fso.getFolder(folderPath).subFolders;
+  var paths = [];
+
+  for (var c = new Enumerator(subfolderCollection); !c.atEnd(); c.moveNext())
+    paths.push(absolute ? c.item().path : c.item().name);
+
+  return paths;
+}
+
+/**
+ * Reads file names within a folder using optional absolute path resolution.
+ * Accepts an options hash to mimic Array.prototype methods while staying JScript-safe.
+ *
+ * @param {string} folderPath                            - Directory to enumerate.
+ * @param {{ absolute?: boolean }} [options=null]  - Optional flags (absolute=true yields file paths instead of names).
+ * @returns {string[]} File names or absolute paths for each entry.
+ *
+ * @example
+ * readFileNames('C:/sql/functions', { absolute: true });
+ */
+function readFileNames(folderPath, options) {
+  options = object.assign(options, { absolute: false });
+
+  var fso = toad.getFso();
+  var filesCollection = fso.getFolder(folderPath).files;
+  var paths = [];
+
+  for (var c = new Enumerator(filesCollection); !c.atEnd(); c.moveNext())
+    paths.push(options.absolute ? c.item().path : c.item().name);
+
+  return paths;
+}
+
+/**
+ * Reads the entire contents of a UTF-8 text file via ADODB.Stream.
+ * Returns undefined when the file does not exist to keep call sites simple.
+ *
+ * @param {string} filePath - Absolute file path pointing to the text file.
+ * @returns {string|undefined} File contents when found; otherwise undefined.
+ *
+ * @example
+ * var sql = readFile('C:/sql/functions/fn_tax_rate.sql');
+ */
+function readFile(filePath) {
+  var fso = toad.getFso();
+  // Open the file for input.
+  if (fso.FileExists(filePath)) {
+    f = fso.OpenTextFile(filePath, 1);
+    // Read from the file.
+    if (f.AtEndOfStream) return "";
+    else return f.ReadAll();
+  }
+}
+
+/**
+ * Writes text content to the specified path, overwriting any existing file.
+ * Uses the host's FileSystemObject and logs failures instead of throwing.
+ *
+ * @param {string} filePath  - Destination path to create or replace.
+ * @param {string} content   - Text payload written to the file.
+ *
+ * @example
+ * writeFile('C:/sql/functions/fn_tax_rate.sql', generateSql());
+ */
+function writeFile(filePath, content) {
+  var fso = toad.getFso("Scripting.FileSystemObject");
+  try {
+    var file = fso.CreateTextFile(filePath, true);
+    file.WriteLine(content);
+    file.close();
+  } catch (e) {
+    toad.getLog().error("Failed to write file: " + filePath + " Error: " + e.message);
+  }
+}
+
+/**
+ * Returns the date the specified file was last modified.
+ * The value is coerced to a string to simplify serialization to logs.
+ *
+ * @param {string} filePath - File to inspect.
+ * @returns {string|undefined} Date string or undefined when the file is missing.
+ *
+ * @example
+ * var lastSync = getFileModificationDate('C:/sql/functions/fn_tax_rate.sql');
+ */
+function getFileModificationDate(filePath) {
+  var fso = toad.getFso();
+  if (fso.FileExists(filePath)) {
+    var file = fso.getFile(filePath);
+    if (file.DateLastModified != null) return file.DateLastModified + "";
+  }
+}
+
+/**
+ * Recursively traverses files under a directory and invokes a callback per match.
+ * Supports extension and RegExp filters plus a running accumulator (e.g., list builder).
+ *
+ * @param {string} filePath                                    - Root directory to scan.
+ * @param {function(File, *): *} callback                  - Invoked with (file, accumulator) per matching file.
+ * @param {{ extension?: string|string[], regExp?: RegExp }} [options=null] - Filtering options.
+ * @param {*} [accumulator]                                - Seed value threaded through each callback invocation.
+ * @returns {*} Final accumulator returned after visiting all files.
+ *
+ * @example
+ * traverseFiles('C:/sql', function(file, acc) { acc.push(file.Path); return acc; }, { extension: '.sql' }, []);
+ */
+function traverseFiles(filePath, callback, options, accumulator) {
+  options = object.assign(options, { extension: null, regExp: null });
+
+  var fso = toad.getFso();
+  var folder = fso.getFolder(filePath);
+
+  for (var c = new Enumerator(folder.files); !c.atEnd(); c.moveNext()) {
+    var file = c.item();
+    var currentExtension = path.extname(file.name);
+    var extensionFiltered =
+      !options.extension ||
+      options.extension === currentExtension ||
+      (options.extension instanceof Array &&
+        indexOf(options.extension, currentExtension) > -1);
+    var regExpFiltered = !options.regExp || file.path.match(options.regExp);
+
+    if (extensionFiltered && regExpFiltered)
+      accumulator = callback(file, accumulator);
+  }
+
+  for (var c = new Enumerator(folder.subFolders); !c.atEnd(); c.moveNext())
+    accumulator = traverseFiles(c.item().path, callback, options, accumulator);
+
+  return accumulator;
+}
+]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>fs</Caption>
+			<Parent>
+				<Id>{FF8E8814-FCE5-423D-BDEA-814E9EF93456}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+			</Visibilities>
+		</Script>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{17ADE8CC-FD0B-4104-8D5C-8B6C75CC4DEC}</Id>
+			<Name>functionParser</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[// Constantsvar
+var LANGUAGES = {
+  sql: "sql",
+  c: "c",
+  internal: "internal",
+  plpgsql: "plpgsql"
+};
+
+var OPTION_TERMINATORS = [
+  "LANGUAGE",
+  "IMMUTABLE",
+  "STABLE",
+  "VOLATILE",
+  "STRICT",
+  "RETURNS",
+  "SECURITY",
+  "COST",
+  "ROWS",
+  "PARALLEL",
+  "WINDOW",
+  "CALLED",
+  "LEAKPROOF",
+  "NOT",
+  "SET",
+  "AS",
+  "TRANSFORM"
+];
+
+var SKIP = {
+  guid: "ALL",
+  asClause: "ALL",
+  raw: "ALL",
+  filePath: "ALL",
+  fullName: "ALL",
+  type: "ALL",
+  schema: "ALL",
+  returns: "PROCEDURE",
+  volatility: "PROCEDURE",
+  leakproof: "PROCEDURE",
+  isStrict: "PROCEDURE",
+  cost: "PROCEDURE",
+  rows: "PROCEDURE",
+  window: "PROCEDURE",
+  parallel: "PROCEDURE"
+};
+
+
+
+function _updateFrom(item, parsed) {
+  var model = toad.getModel();
+  var schema =
+    model.schemas.getObjectByName(parsed.schema) ||
+    model.createNewObject(2024);
+
+  schema.lock();
+  item.lock();
+
+  if (schema.name !== parsed.schema)
+    schema.name = parsed.schema;
+
+  item.schema = schema;
+  item.generateSQLOnly = false;
+
+  for (var key in parsed) {
+    if (!(SKIP[key] === "ALL" || SKIP[key] === parsed.type)) {
+      try {
+        item[key] = parsed[key];
+      } catch (e) {
+        toad.getLog().error("Failed to set property '" + key + "' on item '" + item.fullName + "'");
+      }
+    }
+  }
+
+  item.unlock();
+  schema.unlock();
+}
+
+
+function updateFrom(input) {
+  var parsed = typeof input === "string" ? parse(input) : input
+  var model = toad.getModel();
+  var log = toad.getLog();
+
+  // Create Item
+  if (parsed.guid) {
+    var collection = parsed.type === "FUNCTION" ? model.Functions : model.Procedures;
+    try {
+      var item = collection.getObjectById(parsed.guid);
+    } catch (e) {
+
+    }
+  }
+  if (!item)
+           item = model.createNewObject(parsed.type === "FUNCTION" ? 2028 : 2015);
+
+  _updateFrom(item, parsed);
+  return item;
+}
+
+
+
+/**
+ * Parses PostgreSQL CREATE FUNCTION/PROCEDURE statements into structured metadata.
+ * Handles dollar-quoted bodies, single-quoted externals, options that appear before/after the body, and trailing COMMENT ON FUNCTION blocks.
+ *
+ * @param {string} functionSQL      - Raw SQL text that may include the CREATE statement and optional comment.
+ * @param {string} filePath         - Absolute file path of the source SQL (used for diagnostics).
+ * @returns {object|undefined}      - Structured info with the following keys when parsing succeeds:
+ *   - beforeScript {string}  Leading text before CREATE.
+ *   - raw {string}           Original function SQL (un-normalized).
+ *   - afterScript {string}   Trailing text after COMMENT ON (if any).
+ *   - type {"FUNCTION"|"PROCEDURE"} Object kind.
+ *   - fullName/schema/name/caption {string} Derived identifiers.
+ *   - argumentList {string}  Windows-line-ending argument list.
+ *   - returns {string}       RETURNS clause payload.
+ *   - language {string}      Normalized language (sql, c, plpgsql, etc.).
+ *   - userDefinedLanguage {string|undefined} Original language when not recognized.
+ *   - volatility {string}    IMMUTABLE/STABLE/VOLATILE.
+ *   - isSecurityDefiner {boolean}
+ *   - leakproof {boolean}
+ *   - isStrict {boolean}
+ *   - cost {string|undefined}
+ *   - rows {string|undefined}
+ *   - window {boolean}
+ *   - parallel {string}
+ *   - sql {string}           Body text stripped of delimiters.
+ *   - asClause {string}      Raw AS literal.
+ *   - filePath {string}
+ *   - fromFile {boolean}
+ *   - guid {string|undefined} Parsed `@GUID {96E5CCA4-851E-497B-809A-D94334716DD4}` marker inside body. (Including curly braces '{}')
+ *   - comments {string|undefined} COMMENT ON payload when present.
+ *
+ * @example
+ * parseFunctionSQL("CREATE OR REPLACE FUNCTION public.calculate(a int) RETURNS int AS $$ BEGIN ... $$ LANGUAGE plpgsql;");
+ */
+function parse(functionSQL, filePath) {
+  if (!functionSQL) return undefined;
+
+  var normalized = string.convertLineEndingsToWin(functionSQL);
+  var createInfo = extractCreateStatement(normalized);
+  if (!createInfo) return undefined;
+
+  var commentInfo = _extractTrailingComment(normalized, createInfo.startIndex);
+  var definitionSection = commentInfo
+    ? normalized.slice(createInfo.startIndex, commentInfo.commentIndex)
+    : normalized.slice(createInfo.startIndex);
+  var commentText = commentInfo ? commentInfo.comment : undefined;
+  var afterScript = commentInfo
+    ? string.trim(commentInfo.after, { emptyLinesOnly: true })
+    : "";
+
+  var statement = definitionSection;
+  var createTokenEnd = createInfo.afterKeywordIndex - createInfo.startIndex;
+  var openParenIndex = _findTopLevelChar(statement, "(", createTokenEnd);
+  if (openParenIndex === -1) return undefined;
+
+  var nameSegment = string.trim(
+    statement.slice(createTokenEnd, openParenIndex)
+  );
+  var parsedName = sql.parseFullName(nameSegment);
+  var argsInfo = _extractBalancedParentheses(statement, openParenIndex);
+  if (!argsInfo) return undefined;
+
+  var bodyInfo = _locateBodyLiteral(statement, argsInfo.endIndex);
+  if (!bodyInfo) return undefined;
+
+  var optionsSegment =
+    statement.slice(argsInfo.endIndex, bodyInfo.literalStart) +
+    " " +
+    statement.slice(bodyInfo.literalEnd);
+  var optionSearch = _collapseWhitespace(optionsSegment);
+  var optionUpper = _wrapWithSpaces(optionSearch.toUpperCase());
+
+  var returnsClause = _extractClause(
+    optionsSegment,
+    "RETURNS",
+    OPTION_TERMINATORS
+  );
+  var languageClause = _extractLanguage(optionsSegment);
+  var costClause = _extractNumericOption(optionsSegment, "COST");
+  var rowsClause = _extractNumericOption(optionsSegment, "ROWS");
+  var parallelClause = _extractParallelOption(optionsSegment);
+
+  var result = {};
+  result.beforeScript = string.trim(
+    normalized.slice(0, createInfo.startIndex),
+    {
+      emptyLinesOnly: true
+    }
+  );
+  result.raw = functionSQL;
+  result.afterScript = afterScript;
+  result.type = createInfo.type;
+  result.fullName = parsedName.fullName;
+  result.schema = parsedName.schema;
+  result.caption = parsedName.name;
+  result.name = parsedName.name;
+  result.argumentList = _formatArgumentList(argsInfo.content);
+  result.returns = returnsClause || "";
+  var languageValue = languageClause ? languageClause.replace(/"/g, "") : "";
+  result.language = _resolveLanguage(languageValue);
+  result.userDefinedLanguage =
+    result.language === "user-defined" && languageValue
+      ? languageValue
+      : undefined;
+  result.volatility = _containsWord(optionUpper, "IMMUTABLE")
+    ? "IMMUTABLE"
+    : _containsWord(optionUpper, "STABLE")
+      ? "STABLE"
+      : "VOLATILE";
+  result.isSecurityDefiner = _containsPhrase(optionUpper, "SECURITY DEFINER");
+  result.leakproof =
+    _containsPhrase(optionUpper, "LEAKPROOF") &&
+    !_containsPhrase(optionUpper, "NOT LEAKPROOF");
+  result.isStrict =
+    _containsWord(optionUpper, "STRICT") ||
+    _containsPhrase(optionUpper, "RETURNS NULL ON NULL INPUT") ||
+    _containsPhrase(optionUpper, "CALLED ON NULL INPUT");
+  result.cost = costClause;
+  result.rows = rowsClause;
+  result.window = _containsWord(optionUpper, "WINDOW");
+  result.parallel = parallelClause || "UNSAFE";
+  result.sql = bodyInfo.bodyText;
+  result.asClause = bodyInfo.literal;
+  result.filePath = filePath;
+  result.fromFile = true;
+  result.guid = _extractGUID(functionSQL);
+  result.comments = commentText;
+
+  return result;
+}
+
+function _extractGUID(bodyText) {
+  if (!bodyText) return undefined;
+  //var TOAD_ID_REGEX = /toad:id\s*=\s*([A-Za-z0-9_-]+)/i;
+  var GUID_REGEX = /\@GUID\s*(\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\})/i;
+  var match = GUID_REGEX.exec(bodyText);
+  return match ? match[1] : undefined;
+}
+
+
+function extractCreateStatement(sql) {
+  var pattern = /CREATE\s+(?:OR\s+REPLACE\s+)?(FUNCTION|PROCEDURE)\s+/i;
+  var match = pattern.exec(sql);
+  if (!match) return undefined;
+  return {
+    type: match[1].toUpperCase(),
+    startIndex: match.index,
+    afterKeywordIndex: match.index + match[0].length
+  };
+}
+
+function _extractTrailingComment(sql, createIndex) {
+  var commentRegex =
+    /COMMENT\s+ON\s+(FUNCTION|PROCEDURE)[\s\S]+?IS\s+(\$[A-Za-z0-9_]*\$[\s\S]*?\$[A-Za-z0-9_]*\$|'(?:''|[^'])*')\s*;([\s\S]*)$/i;
+  var match = commentRegex.exec(sql);
+  if (!match || match.index <= createIndex) {
+    return undefined;
+  }
+  return {
+    commentIndex: match.index,
+    comment: _unquoteCommentLiteral(match[2]),
+    after: match[3]
+  };
+}
+
+function _unquoteCommentLiteral(literal) {
+  if (!literal) return "";
+  if (literal.charAt(0) === "$") {
+    var tag = literal.match(/^\$[A-Za-z0-9_]*\$/)[0];
+    return string.convertLineEndingsToWin(
+      literal.substring(tag.length, literal.length - tag.length)
+    );
+  }
+  return string.convertLineEndingsToWin(
+    literal.substring(1, literal.length - 1).replace(/''/g, "'")
+  );
+}
+
+function _findTopLevelChar(text, target, startIndex) {
+  var ctx = _createScanContext();
+  for (var i = startIndex; i < text.length; i += 1) {
+    ctx.advance(text, i);
+    if (ctx.skipLength > 0) {
+      i += ctx.skipLength - 1;
+      ctx.skipLength = 0;
+      continue;
+    }
+    if (ctx.isActive()) {
+      continue;
+    }
+    if (text.charAt(i) === target) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function _extractBalancedParentheses(text, openIndex) {
+  var ctx = _createScanContext();
+  var depth = 1;
+  var contentStart = openIndex + 1;
+  for (var i = openIndex + 1; i < text.length; i += 1) {
+    ctx.advance(text, i);
+    if (ctx.skipLength > 0) {
+      i += ctx.skipLength - 1;
+      ctx.skipLength = 0;
+      continue;
+    }
+    if (ctx.isActive()) {
+      continue;
+    }
+    var ch = text.charAt(i);
+    if (ch === "(") {
+      depth += 1;
+      continue;
+    }
+    if (ch === ")") {
+      depth -= 1;
+      if (depth === 0) {
+        return {
+          content: text.slice(contentStart, i),
+          endIndex: i + 1
+        };
+      }
+    }
+  }
+  return undefined;
+}
+
+function _locateBodyLiteral(text, fromIndex) {
+  var ctx = _createScanContext();
+  var depth = 0;
+  for (var i = fromIndex; i < text.length; i += 1) {
+    ctx.advance(text, i);
+    if (ctx.skipLength > 0) {
+      i += ctx.skipLength - 1;
+      ctx.skipLength = 0;
+      continue;
+    }
+    if (ctx.isActive()) {
+      continue;
+    }
+    var ch = text.charAt(i);
+    if (ch === "(") depth += 1;
+    if (ch === ")") depth = Math.max(0, depth - 1);
+    if (
+      (ch === "A" || ch === "a") &&
+      depth === 0 &&
+      _isKeywordAt(text, i, "AS")
+    ) {
+      var literalStart = _skipWhitespace(text, i + 2);
+      var nextChar = text.charAt(literalStart);
+      if (nextChar === "$") {
+        var dollar = _readDollarLiteral(text, literalStart);
+        if (!dollar) return undefined;
+        return {
+          keywordIndex: i,
+          literalStart: dollar.start,
+          literalEnd: dollar.end,
+          literal: dollar.literal,
+          bodyText: string.trim(string.convertLineEndingsToWin(dollar.content), {
+            emptyLinesOnly: true
+          })
+        };
+      }
+      if (nextChar === "'") {
+        var single = _readSingleQuotedLiteral(text, literalStart);
+        if (!single) return undefined;
+        var cursor = _skipWhitespace(text, single.end);
+        var literalEnd = single.end;
+        if (text.charAt(cursor) === ",") {
+          var secondStart = _skipWhitespace(text, cursor + 1);
+          if (text.charAt(secondStart) === "'") {
+            var second = _readSingleQuotedLiteral(text, secondStart);
+            literalEnd = second.end;
+            single.literal += text.slice(single.end, literalEnd);
+          }
+        }
+        return {
+          keywordIndex: i,
+          literalStart: literalStart,
+          literalEnd: literalEnd,
+          literal: text.slice(literalStart, literalEnd),
+          bodyText: string.trim(string.convertLineEndingsToWin(single.content), {
+            emptyLinesOnly: true
+          })
+        };
+      }
+    }
+  }
+  return undefined;
+}
+
+function _isKeywordAt(text, index, keyword) {
+  var segment = text.substr(index, keyword.length);
+  return (
+    segment.toUpperCase() === keyword &&
+    !_isIdentifierChar(text.charAt(index - 1)) &&
+    !_isIdentifierChar(text.charAt(index + keyword.length))
+  );
+}
+
+function _createScanContext() {
+  return {
+    mode: "normal",
+    skipLength: 0,
+    advance: function (text, index) {
+      var ch = text.charAt(index);
+      var next = text.charAt(index + 1);
+      this.skipLength = 0;
+      if (this.mode === "line") {
+        if (ch === "\n" || ch === "\r") this.mode = "normal";
+        return;
+      }
+      if (this.mode === "block") {
+        if (ch === "*" && next === "/") {
+          this.mode = "normal";
+          this.skipLength = 2;
+        }
+        return;
+      }
+      if (this.mode === "dollar") {
+        if (text.substr(index, this.tag.length) === this.tag) {
+          this.mode = "normal";
+          this.skipLength = this.tag.length;
+        }
+        return;
+      }
+      if (this.mode === "single") {
+        if (ch === "'" && text.charAt(index + 1) !== "'") {
+          this.mode = "normal";
+        } else if (ch === "'" && text.charAt(index + 1) === "'") {
+          this.skipLength = 2;
+        }
+        return;
+      }
+      if (this.mode === "double") {
+        if (ch === '"') this.mode = "normal";
+        return;
+      }
+      if (ch === "-" && next === "-") {
+        this.mode = "line";
+        this.skipLength = 2;
+        return;
+      }
+      if (ch === "/" && next === "*") {
+        this.mode = "block";
+        this.skipLength = 2;
+        return;
+      }
+      if (ch === "$") {
+        var tagMatch = text.substring(index).match(/^\$[A-Za-z0-9_]*\$/);
+        if (tagMatch) {
+          this.mode = "dollar";
+          this.tag = tagMatch[0];
+          this.skipLength = this.tag.length;
+          return;
+        }
+      }
+      if (ch === "'") {
+        this.mode = "single";
+        return;
+      }
+      if (ch === '"') {
+        this.mode = "double";
+      }
+    },
+    isActive: function () {
+      return this.mode !== "normal";
+    }
+  };
+}
+
+function _skipWhitespace(text, index) {
+  var i = index;
+  while (i < text.length && /\s/.test(text.charAt(i))) {
+    i += 1;
+  }
+  return i;
+}
+
+function _isIdentifierChar(char) {
+  return /[A-Za-z0-9_]/.test(char || "");
+}
+
+function _readDollarLiteral(text, start) {
+  var tagMatch = text.substring(start).match(/^\$[A-Za-z0-9_]*\$/);
+  if (!tagMatch) return undefined;
+  var tag = tagMatch[0];
+  var closing = text.indexOf(tag, start + tag.length);
+  if (closing === -1) return undefined;
+  return {
+    start: start,
+    end: closing + tag.length,
+    literal: text.substring(start, closing + tag.length),
+    content: text.substring(start + tag.length, closing)
+  };
+}
+
+function _readSingleQuotedLiteral(text, start) {
+  var i = start + 1;
+  while (i < text.length) {
+    if (text.charAt(i) === "'") {
+      if (text.charAt(i + 1) === "'") {
+        i += 2;
+        continue;
+      }
+      return {
+        start: start,
+        end: i + 1,
+        literal: text.substring(start, i + 1),
+        content: text.substring(start + 1, i).replace(/''/g, "'")
+      };
+    }
+    i += 1;
+  }
+  return undefined;
+}
+
+function _extractClause(segment, keyword, terminators) {
+  if (!segment) return "";
+  var search = segment + "\n__END__";
+  var keywordUpper = keyword.replace(/\s+/g, " ").toUpperCase();
+  var terminatorFiltered = array.filter(terminators, function (term) {
+    return term && term.toUpperCase() !== keywordUpper;
+  });
+  var terminatorPattern = terminatorFiltered.concat(["__END__"]).join("|");
+  var pattern = new RegExp(
+    keyword.replace(/\s+/g, "\\s+") +
+      "\\s+([\\s\\S]+?)(?=\\b(" +
+      terminatorPattern +
+      ")\\b)",
+    "i"
+  );
+  var match = pattern.exec(search);
+  return match ? string.trim(match[1]) : "";
+}
+
+function _extractLanguage(segment) {
+  if (!segment) return "";
+  var match = segment.match(/LANGUAGE\s+(?:"([^"]+)"|([A-Za-z0-9_]+))/i);
+  if (!match) return "";
+  return match[1] || match[2] || "";
+}
+
+function _extractNumericOption(segment, keyword) {
+  if (!segment) return undefined;
+  var regex = new RegExp(keyword + "\\s+([0-9]+(?:\\.[0-9]+)?)", "i");
+  var match = regex.exec(segment);
+  return match ? match[1] : undefined;
+}
+
+function _extractParallelOption(segment) {
+  if (!segment) return undefined;
+  var match = segment.match(/PARALLEL\s+(SAFE|RESTRICTED|UNSAFE)/i);
+  return match ? match[1].toUpperCase() : undefined;
+}
+
+function _wrapWithSpaces(value) {
+  return " " + (value || "") + " ";
+}
+
+function _collapseWhitespace(value) {
+  if (!value) return "";
+  return string.trim(value).replace(/\s+/g, " ");
+}
+
+function _containsWord(haystack, needle) {
+  var pattern = new RegExp("\\b" + needle + "\\b", "i");
+  return pattern.test(haystack);
+}
+
+function _containsPhrase(haystack, phrase) {
+  return haystack.indexOf(phrase) !== -1;
+}
+
+function _formatArgumentList(content) {
+  if (!content) return "";
+  var normalized = string.trim(string.convertLineEndingsToWin(content), {
+    emptyLinesOnly: true
+  });
+  return normalized ? normalized + "\r\n" : "";
+}
+
+function _resolveLanguage(languageClause) {
+  if (!languageClause) return "user-defined";
+  var normalized = languageClause.toLowerCase();
+  return LANGUAGES[normalized] || "user-defined";
+}
+
+
+// ---------------------------------------- Add Body Marker ---------------------------------------- //
+
+/**
+ * Ensures a canonical `@GUID {....}` marker exists inside a PostgreSQL function body.
+ * - LANGUAGE plpgsql: inserts the marker on the first line after BEGIN when missing.
+ * - LANGUAGE sql: inserts the marker immediately after the opening $$ line when missing.
+ * - Existing `@GUID {..}` lines are replaced in place instead of duplicating the marker.
+ *
+ * @param {string} functionSql - Full CREATE FUNCTION/PROCEDURE definition.
+ * @param {string} guid        - GUID literal with or without braces.
+ * @returns {string}           - Script with the GUID marker enforced, or the original text when unchanged.
+ */
+function insertBodyText(functionSql, guid) {
+  if (!functionSql || !guid) return functionSql;
+
+  var cleanedGuid = string.trim((guid + "").replace(/[{}]/g, ""));
+  if (!string.validateGuid(cleanedGuid)) return functionSql;
+  var markerLine = "@GUID {" + cleanedGuid.toUpperCase() + "}";
+
+  var windowsSql = string.convertLineEndingsToWin(functionSql);
+  var parsed = parse(windowsSql);
+  if (!parsed || !parsed.asClause) return functionSql;
+
+  var literal = _extractDollarLiteral(parsed.asClause);
+  if (!literal) return functionSql;
+
+  var body = literal.body;
+  var updatedBody = _replaceGuidLine(body, markerLine);
+
+  if (!updatedBody) {
+    var annotatedMarker = "-- " + markerLine + " - DON'T CHANGE THIS LINE! TOAD Data Modeler ID used in sync.";
+    if (/\bLANGUAGE\s+"?plpgsql"?/i.test(windowsSql))
+      updatedBody = _insertAfterBeginLine(body, annotatedMarker);
+    else updatedBody = _insertAfterOpeningLine(body, annotatedMarker);
+  }
+
+  if (!updatedBody) return functionSql;
+  var updatedLiteral = literal.open + updatedBody + literal.close;
+  var updatedSql = windowsSql.replace(parsed.asClause, updatedLiteral);
+  return _matchOriginalLineEndings(functionSql, updatedSql);
+}
+
+function _extractDollarLiteral(asClause) {
+  if (!asClause) return undefined;
+  var delimiterMatch = asClause.match(/\$[A-Za-z0-9_]*\$/);
+  if (!delimiterMatch) return undefined;
+  var delimiter = delimiterMatch[0];
+  var startIndex = asClause.indexOf(delimiter);
+  var endIndex = asClause.lastIndexOf(delimiter);
+  if (endIndex === -1 || endIndex <= startIndex) return undefined;
+  return {
+    open: asClause.slice(0, startIndex + delimiter.length),
+    body: asClause.slice(startIndex + delimiter.length, endIndex),
+    close: asClause.slice(endIndex)
+  };
+}
+
+function _insertAfterOpeningLine(body, markerText) {
+  var lineBreakMatch = body.match(/(\r\n|\n|\r)/);
+  var newline = lineBreakMatch ? lineBreakMatch[0] : "\r\n";
+  var insertIndex = lineBreakMatch ? lineBreakMatch.index + newline.length : 0;
+  return body.slice(0, insertIndex) + markerText + newline + body.slice(insertIndex);
+}
+
+function _insertAfterBeginLine(body, markerText) {
+  var beginRegex = /(^|\r?\n)([ \t]*)BEGIN\b/i;
+  var match = beginRegex.exec(body);
+
+  if (!match) return undefined;
+
+  var beginEndIndex = match.index + match[0].length;
+  var remainder = body.slice(beginEndIndex);
+  var newlineMatch = remainder.match(/(\r\n|\n|\r)/);
+  var newline = newlineMatch ? newlineMatch[0] : "\r\n";
+  var insertIndex = newlineMatch
+    ? beginEndIndex + newlineMatch.index + newline.length
+    : body.length;
+
+  var indentMatch = body.slice(insertIndex).match(/^[ \t]*/);
+  var indent = indentMatch ? indentMatch[0] : match[2] || "  ";
+
+  return body.slice(0, insertIndex) + indent + markerText + newline + body.slice(insertIndex);
+}
+
+function _replaceGuidLine(body, markerLine) {
+  var regex = /(^|\r?\n)([ \t]*)(--[ \t]*)?@GUID\s*\{[^}]+\}([^\r\n]*)(\r?\n|$)/i;
+  var replaced = false;
+  var updated = body.replace(regex, function (_, prefixBreak, indent, commentPrefix, suffix, newline) {
+    replaced = true;
+    var prefix = commentPrefix || "";
+    return (prefixBreak || "") + indent + prefix + markerLine + suffix + (newline || "");
+  });
+  return replaced ? updated : undefined;
+}
+
+function _matchOriginalLineEndings(original, windowsText) {
+  if (original.indexOf("\r\n") !== -1) return windowsText;
+  if (original.indexOf("\n") !== -1) return windowsText.replace(/\r\n/g, "\n");
+  if (original.indexOf("\r") !== -1) return windowsText.replace(/\r\n/g, "\r");
+  return windowsText;
+}
+]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>functionParser</Caption>
+			<Parent>
+				<Id>{FF8E8814-FCE5-423D-BDEA-814E9EF93456}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+			</Visibilities>
+		</Script>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{AE5AC591-A23D-468E-BE0B-12B29D6EAC4E}</Id>
+			<Name>list</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[/**
+ * Iterates over a COM list collection and invokes the callback with the current item,
+ * zero-based index, and the original collection.
+ *
+ * @param {List} collection - COM collection exposed to Enumerator().
+ * @param {function(*, number, List): void} callback - Receives (item, index, collection).
+ *   item       - value returned by Enumerator.item().
+ *   index      - zero-based position within the iteration.
+ *   collection - original COM source passed to the helper.
+ *
+ * @example
+ * // Iterate over files in a folder
+ * var fs = new ActiveXObject("Scripting.FileSystemObject");
+ * var folder = fs.GetFolder("C:\\MyProject");
+ * forEach(folder.Files, function(file, index) {
+ *     ShowInformation("File " + index + ": " + file.Name);
+ * });
+ */
+function forEach(collection, callback) {
+  for (var i = 0; i < collection.Count; i++) callback(collection.getObject(i), i, collection);
+}
+
+
+/**
+ * Materializes a COM List collection into a plain JScript array.
+ *
+ * @param {List} collection - Enumerator-compatible COM collection (e.g., Folder.Files).
+ * @returns {Array}         - New array containing a snapshot copy of each element.
+ */
+function toArray(collection) {
+  var result = [];
+
+  for (var i = 0; i < collection.Count; i++) result.push(collection.getObject(i));
+
+  return result;
+}
+
+/**
+ * Projects a COM List collection into an object map using custom key/value pickers.
+ *
+ * @param {List} collection                 - Enumerator-friendly COM list.
+ * @param {string|function(*): string} keySelector - Property name or callback returning the key.
+ * @param {string|function(*): *} [valueSelector]  - Property name or callback for the stored value.
+ *                                                   Defaults to the original item reference.
+ * @returns {Object}                        - Plain object keyed by the selector result.
+ *
+ * @example
+ * // Map Toad Data Modeler tables by their internal IDs
+ * var tablesById = toObject(model.Entities, "Id");
+ * var tablesById2 = toObject(model.Entities, function(table) { return table.Id; });
+ * // tablesById["ENT_1"] === "Accounts"
+ */
+function toObject(collection, keySelector, valueSelector) {
+  var result = {};
+  for (var i = 0; i < collection.Count; i++) {
+    var item = collection.getObject(i);
+    var key = typeof keySelector === "string" ? item[keySelector] : keySelector(item);
+    var value = typeof valueSelector === "string" ? item[valueSelector] : valueSelector ? valueSelector(item) : item;
+    result[key] = value;
+  }
+  return result;
+}
+]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>list</Caption>
+			<Parent>
+				<Id>{FF8E8814-FCE5-423D-BDEA-814E9EF93456}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+			</Visibilities>
+		</Script>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{C0090A72-90D1-435C-B752-EB66ED69C10E}</Id>
+			<Name>object</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[/**
+ * Logs given simple variable's or object's or array's properties into logging window.
+ *
+ * @param {*} target is the variable to inspect.
+ * @param {number} _level is the level in recursion.
+ * @param {string} _parentKey is the key from parent.
+ * @returns {void}
+ */
+function inspect(target, _level, _parentKey) {
+  var log = toad.getLog()
+  _level = _level || 0;
+
+  if (_level > 0 && _parentKey !== undefined)
+    log.information(string.repeat(" |-- ", _level - 1) + "[" + _parentKey + "]: ");
+
+  for (var key in target)
+    typeof target[key] === "object"
+      ? inspect(target[key], _level + 1, key)
+      : log.information(
+          string.repeat(" |-- ", _level) + "[" + key + "]: " + target[key]
+        );
+}
+
+/**
+ * Assign attributes from defaults object into target object if it is undefined in target object.
+ *
+ * @param {object} target is the object assign default values to.
+ * @param {object} defaults is the object containing default values.
+ * @returns {object} target object including default values.
+ *
+ * @example
+ * assign({ name: "John", surname: "Doe" }, { name: "Jane", level: 10 }); // { name: "John", surname: "Doe", level: 10 }
+ */
+function assign(target, defaults) {
+  target = target || defaults;
+
+  for (var key in defaults)
+    target[key] = target[key] === undefined ? defaults[key] : target[key];
+
+  return target;
+}
+
+/**
+ * Returns an array of an object's own enumerable property names.
+ * Provides an Object.keys equivalent for JScript environments.
+ *
+ * @param {object} target - Source object to inspect.
+ * @returns {string[]}    - List of keys owned directly by the object.
+ *
+ * @example
+ * var keys = getKeys({ a: 1, b: 2 });
+ * // keys.length === 2
+ */
+function keys(target) {
+  var result = [];
+  if (!target) return result;
+  for (var key in target)
+    if (Object.prototype.hasOwnProperty.call(target, key)) result.push(key);
+  return result;
+}
+
+]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>object</Caption>
+			<Parent>
+				<Id>{FF8E8814-FCE5-423D-BDEA-814E9EF93456}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+			</Visibilities>
+		</Script>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{5D397018-6648-4196-98C3-101CDA71C38B}</Id>
+			<Name>path</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[/**
+ * Gets the directory of a path.
+ *
+ * @param {string} filePath is the path to get directory of.
+ * @returns {string} Directory of the given path.
+ *
+ * @example
+ * dirname("a/b/c.txt"); // "a/b"
+ */
+function dirname(filePath) {
+  return filePath.substring(0, filePath.lastIndexOf("\\") + 1);
+}
+
+/**
+ * Gets the last portion of a path.
+ *
+ * @param {string} filePath is the bath to get base name of.
+ * @param {string} [suffix] suffix to remove from the base name.
+ * @returns {string} last portion of the path.
+ *
+ * @example
+ * basename("a/b/c.txt"); // "c.txt"
+ * basename("a/b/c.txt", ".txt"); // "c"
+ */
+function basename(filePath, suffix) {
+  return filePath
+    .substring(filePath.lastIndexOf("\\") + 1)
+    .replace(new RegExp(suffix + "$"), "");
+}
+
+/**
+ * Gets the extension of the path, from the last occurrence
+ * of the . (period) character to end of string in the last portion of the path.
+ *
+ * @param {string} filePath is the path to get extension of.
+ * @returns {string} extension.
+ *
+ * @example
+ * extname("a/b/c.txt"); // ".txt"
+ */
+function extname(filePath) {
+  return filePath.substring(filePath.lastIndexOf(".") + 1);
+}
+
+/**
+ * Returns an object whose properties represent significant elements of the path.
+ *
+ * @param {string} filePath is the path to get extension of.
+ * @returns {Object} significant elements of the path.
+ *
+ * @example
+ * parse("/home/user/dir/file.txt");
+ * {
+ *   dir: "/home/user/dir",
+ *   base: "file.txt",
+ *   ext: ".txt",
+ *   name: "file"
+ * }
+ */
+function parse(filePath) {
+  var extension = extname(filePath);
+  return {
+    dir: dirname(filePath),
+    base: baseName(filePath),
+    ext: extension,
+    name: baseName(filePath, extension)
+  };
+}
+]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>path</Caption>
+			<Parent>
+				<Id>{FF8E8814-FCE5-423D-BDEA-814E9EF93456}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+			</Visibilities>
+		</Script>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{30240EC1-3ADE-4C89-84EF-96ADC296C634}</Id>
+			<Name>sql</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[/**
+ * Removes double quotes from given identifier.
+ *
+ * @param {string} identifier is the identifier to remove quotes from.
+ * @returns {string} unquoted identifier.
+ *
+ * @example
+ * unquoteIdentifier('"Member"'); // 'Member'
+ */
+function unquoteIdentifier(identifier) {
+  return identifier.replace(/^"|"$/g, "");
+}
+
+/**
+ * Returns schema and name from given full name as an object.
+ *
+ * @param {string} fullName is the string to parse.
+ * @param {object} options
+ * @param {boolean} [options.unquote = true] is whether to remove quotes around names.
+ * @returns {{ schema: string, name: string, fullName: string }} parsed object.
+ *
+ * @example
+ * parseFullName('public."Member"'); // { schema: "public", name: "Member", fullName: "public.Member" }
+ * parseFullName('public."Member"', { unquote: false }); // { schema: "public", name: '"Member"', fullName: 'public."Member"' }
+ */
+function parseFullName(fullName, options) {
+  options = object.assign(options, { unquote: true });
+  var parts = fullName.split(".");
+  parts[0] = options.unquote ? unquoteIdentifier(parts[0]) : parts[0];
+  if (parts.length > 1)
+    parts[1] = options.unquote ? unquoteIdentifier(parts[1]) : parts[1];
+
+  return parts.length === 1
+    ? { name: parts[0], fullName: parts[0] }
+    : { schema: parts[0], name: parts[1], fullName: parts[0] + "." + parts[1] };
+}
+]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>sql</Caption>
+			<Parent>
+				<Id>{FF8E8814-FCE5-423D-BDEA-814E9EF93456}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+			</Visibilities>
+		</Script>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{CC070B86-7837-4C64-B1FB-F39A1E86AD2F}</Id>
+			<Name>string</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[var RE = {
+    spacesAtBeginning: /^(\s|(\r?\n))+/,
+    spacesAtEnd: /(\s|(\r?\n))+$/,
+    emptyLinesAtBeginning: /^(\s*(\r?\n))+/,
+    emptyLinesAtEnd: /((\r?\n)\s*)+$/,
+    guid: /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/
+};
+
+/**
+ * Repeats given string in given quantity.
+ *
+ * @param {string} string is the string to repeat.
+ * @param {number} quantity is the quantity to repeat.
+ * @returns {string} Repeated string.
+ *
+ * @example
+ * repeat("a", 3); // "aaa"
+ */
+function repeat(string, quantity) {
+  var result = "";
+  for (var i = 0; i < quantity || 0; i++) result += string;
+  return result;
+}
+
+/**
+ * Removes spaces from beginning and end of the string.
+ *
+ * @param {string} string is the string spaces from.
+ * @param {Object} options
+ * @param {boolean} [options.emptyLinesOnly = false] Trim only empty lines only.
+ * @returns {string} trimmed string.
+ *
+ * @example
+ * trim("   abc   "); // "abc"
+ */
+function trim(string, options) {
+  options = object.assign(options, { emptyLinesOnly: false });
+  var reBeginning = options.emptyLinesOnly
+    ? RE.emptyLinesAtBeginning
+    : RE.spacesAtBeginning;
+  var reEnd = options.emptyLinesOnly ? RE.emptyLinesAtEnd : RE.spacesAtEnd;
+  return typeof string === "string"
+    ? string.replace(reBeginning, "").replace(reEnd, "")
+    : string;
+}
+
+/**
+ * Removes single or double quotes from given identifier.
+ *
+ * @param {string} string is the identifier to remove quotes from.
+ * @returns {string} unquoted identifier.
+ *
+ * @example
+ * unquote('"Member"'); // 'Member'
+ * unquote("'Member'"); // 'Member'
+ */
+function unquote(string) {
+  return string.replace(/^['"]|['"]$/g, "");
+}
+
+/**
+ * Converts line endings to Windows format.
+ *
+ * @param {string} string is the string to convert
+ * @returns {string} string with Windows format line ending.
+ */
+function convertLineEndingsToWin(string) {
+  return typeof string === "string" ? string.replace(/\r?\n/g, "\r\n") : string;
+}
+
+/**
+ * Validates whether the given value is a RFC 4122 GUID/UUID string.
+ *
+ * @param {string} value is the candidate string to check.
+ * @returns {boolean} true when value matches the canonical 8-4-4-4-12 hexadecimal format.
+ *
+ * @example
+ * validateGuid("123e4567-e89b-12d3-a456-426614174000"); // true
+ */
+function validateGuid(value) {
+  return typeof value === "string" ? RE.guid.test(value) : false;
+}
+
+]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>string</Caption>
+			<Parent>
+				<Id>{FF8E8814-FCE5-423D-BDEA-814E9EF93456}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+			</Visibilities>
+		</Script>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{7FF46EC3-AF11-46F5-9B9E-6E1681FBBB52}</Id>
+			<Name>toad</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[// Globals
+var app;
+var model;
+var log;
+var fso;
+var modelFolderPath;
+
+function setGlobals() {
+  app = System.GetInterface("Application");
+  model = app.ActiveModel || Model;
+  log = System.CreateObject("Log");
+  fso = new ActiveXObject("Scripting.FileSystemObject");
+  modelFolderPath = path.dirname(model.filePath);
+}
+
+function getModel() {
+  if (!app) setGlobals();
+  return model;
+}
+
+function getLog() {
+  if (!app) setGlobals();
+  return log;
+}
+
+function getFso() {
+  if (!app) setGlobals();
+  return fso;
+}
+
+function getApp() {
+  if (!app) setGlobals();
+  return app;
+}
+
+function getModelFolderPath() {
+  if (!app) setGlobals();
+  return modelFolderPath;
+}
+]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>toad</Caption>
+			<Parent>
+				<Id>{FF8E8814-FCE5-423D-BDEA-814E9EF93456}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+			</Visibilities>
+		</Script>
+	</Scripts>
+	<Macros>
+		<Macro ObjectType="121" CSAOName="Macro" CSAOCaption="Macro">
+			<Id>{600234B0-A963-49C6-BECD-BE8ED543ECDA}</Id>
+			<Name>SyncFunctionsToDbLib</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[var log;
+var model;
+var fso;
+
+function Main() {
+  log = toad.getLog();
+  model = toad.getModel();
+  fso = toad.getFso();
+
+  model.lock()
+  var idLookup = {};
+  idLookup = traverse(toad.getModelFolderPath() + "db-lib\\functions", idLookup);
+  idLookup = traverse(toad.getModelFolderPath() + "db-lib\\procedures", idLookup);
+
+  var items = list.toArray(model.Functions).concat(list.toArray(model.Procedures));
+
+  if (object.keys(idLookup).length > 0) {
+    log.information("Sync complete. Deleting orphaned items.");
+    array.forEach(items, function (item) {
+      if (!idLookup[item.Id]) item.Delete();
+    });
+  }
+
+  model.unlock();
+}
+
+function traverse(folderPath, idLookup) {
+  if (fso.folderExists(folderPath)) {
+    log.information("Starting to traverse: " + folderPath);
+    idLookup = fs.traverseFiles(folderPath, syncToModel, { extension: "sql" }, idLookup);
+  } else {
+    log.information("Folder not found. Skipping: " + folderPath);
+  }
+  return idLookup;
+}
+
+function syncToModel(file, accumulator) {
+  //log.information("Processing file: " + file.name);
+  var content = fs.readFile(file.path);
+  var parsedContent = functionParser.parse(content);
+  var guidFromFile = parsedContent.guid;
+  var item = functionParser.updateFrom(parsedContent);
+  var guidFromItem = item.id;
+
+  // Update the file if the GUIDs differ.
+  if (guidFromFile !== guidFromItem)
+    fs.writeFile(file.path, functionParser.insertBodyText(content, guidFromItem));
+
+  // Add to accumulator to detect items to delete.
+  accumulator[guidFromItem] = true;
+  return accumulator;
+}
+]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>Sync Functions to "db-lib/functions"</Caption>
+			<Parent>
+				<Id>{FA6F16A6-3FA3-4B0A-8290-7FD8AC47017B}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+			</Visibilities>
+			<RegisterOrder>22</RegisterOrder>
+			<AddToPopUpMenu>0</AddToPopUpMenu>
+			<MenuPath>Macros</MenuPath>
+			<AddToMenu>1</AddToMenu>
+			<AlwaysAddToMainMenu>0</AlwaysAddToMainMenu>
+			<SupportedAllObjectTypes>0</SupportedAllObjectTypes>
+			<PopUpMenuPath/>
+			<LERSupportedAllObjectTypes>0</LERSupportedAllObjectTypes>
+			<PERSupportedAllObjectTypes>0</PERSupportedAllObjectTypes>
+			<BlockUndo>1</BlockUndo>
+			<ClearUndo>1</ClearUndo>
+			<ObjectTypes/>
+		</Macro>
+	</Macros>
+	<VisibilityDefinition/>
+	<Visibilities>
+		<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+	</Visibilities>
+</Package>
