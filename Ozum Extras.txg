@@ -516,16 +516,25 @@ function parse(functionSQL, filePath) {
   result.sql = bodyInfo.bodyText;
   result.asClause = bodyInfo.literal;
   result.filePath = filePath;
-  result.fromFile = true;
-  result.guid = _extractGUID(functionSQL);
+  result.guid = extractGUID(functionSQL);
   result.comments = commentText;
 
   return result;
 }
 
-function _extractGUID(bodyText) {
+/**
+ * Extracts the first `@GUID {....}` marker from a SQL body, preserving braces.
+ * Returns `undefined` when the marker is missing or the input is falsy.
+ *
+ * @param {string} bodyText - Raw SQL text (e.g., CREATE FUNCTION block).
+ * @returns {string|undefined} Canonical GUID with braces when present.
+ *
+ * @example
+ *   extractGUID('BEGIN\n  -- @GUID {9968C379-A8C4-4D5A-9F23-4F79E7C3B5E9}\nEND;');
+ *   // => "{9968C379-A8C4-4D5A-9F23-4F79E7C3B5E9}"
+ */
+function extractGUID(bodyText) {
   if (!bodyText) return undefined;
-  //var TOAD_ID_REGEX = /toad:id\s*=\s*([A-Za-z0-9_-]+)/i;
   var GUID_REGEX = /\@GUID\s*(\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\})/i;
   var match = GUID_REGEX.exec(bodyText);
   return match ? match[1] : undefined;
@@ -913,7 +922,7 @@ function insertBodyText(functionSql, guid) {
   var updatedBody = _replaceGuidLine(body, markerLine);
 
   if (!updatedBody) {
-    var annotatedMarker = "-- " + markerLine + " - DON'T CHANGE THIS LINE! TOAD Data Modeler ID used in sync.";
+    var annotatedMarker = "-- " + markerLine + " - DON'T CHANGE THIS LINE! TOAD Data Modeler uses this ID in sync.";
     if (/\bLANGUAGE\s+"?plpgsql"?/i.test(windowsSql))
       updatedBody = _insertAfterBeginLine(body, annotatedMarker);
     else updatedBody = _insertAfterOpeningLine(body, annotatedMarker);
@@ -1250,6 +1259,54 @@ function parse(filePath) {
     name: baseName(filePath, extension)
   };
 }
+
+/**
+ * Gets the relative path from one absolute path to another (Windows-style separators).
+ * Falls back to the target path unchanged when the two locations live on different drives.
+ *
+ * @param {string} fromPath - Starting absolute path.
+ * @param {string} toPath   - Destination absolute path.
+ * @returns {string}        - Relative path (e.g., "..\\scripts\\file.sql") or the destination when no relative path exists.
+ *
+ * @example
+ * relative("C:\\models\\db-lib\\functions", "C:\\models\\scripts\\macro.js"); // "..\\scripts\\macro.js"
+ */
+function relative(fromPath, toPath) {
+  if (!fromPath || !toPath) return "";
+
+  var from = _normalizePath(fromPath);
+  var to = _normalizePath(toPath);
+
+  var fromInfo = _splitPath(from);
+  var toInfo = _splitPath(to);
+
+  // Different drives or UNC roots cannot be expressed relatively.
+  if (fromInfo.root.toLowerCase() !== toInfo.root.toLowerCase()) return to;
+
+  var commonLength = 0;
+  var maxCommon = Math.min(fromInfo.parts.length, toInfo.parts.length);
+  while (commonLength < maxCommon && fromInfo.parts[commonLength].toLowerCase() === toInfo.parts[commonLength].toLowerCase())
+    commonLength += 1;
+
+  var up = [];
+  for (var i = commonLength; i < fromInfo.parts.length; i++) up.push("..");
+  var down = toInfo.parts.slice(commonLength);
+  var segments = up.concat(down);
+  if (!segments.length) return ".";
+  return segments.join("\\");
+}
+
+function _normalizePath(pathValue) {
+  return (pathValue || "").replace(/\//g, "\\");
+}
+
+function _splitPath(value) {
+  var match = value.match(/^([A-Za-z]:|\\\\[^\\]+\\[^\\]+)/);
+  var root = match ? match[0] : "";
+  var remainder = value.slice(root.length).replace(/^\\+|\\+$/g, "");
+  var parts = remainder ? remainder.split(/\\+/) : [];
+  return { root: root, parts: parts };
+}
 ]]>
 			</Source>
 			<Author/>
@@ -1526,10 +1583,11 @@ function Main() {
 
   var items = list.toArray(model.Functions).concat(list.toArray(model.Procedures));
 
+  // Delete orphaned items previosuly added from file system. (Non added items does not have @GUID number in SQL.)
   if (object.keys(idLookup).length > 0) {
     log.information("Sync complete. Deleting orphaned items.");
     array.forEach(items, function (item) {
-      if (!idLookup[item.Id]) item.Delete();
+      if (!idLookup[item.Id] && functionParser.extractGUID(item.sql)) item.Delete();
     });
   }
 
@@ -1547,19 +1605,26 @@ function traverse(folderPath, idLookup) {
 }
 
 function syncToModel(file, accumulator) {
-  //log.information("Processing file: " + file.name);
-  var content = fs.readFile(file.path);
-  var parsedContent = functionParser.parse(content);
-  var guidFromFile = parsedContent.guid;
-  var item = functionParser.updateFrom(parsedContent);
-  var guidFromItem = item.id;
+  var relativePath = path.relative(toad.getModelFolderPath() + "db-lib", file.path);
+  //log.information("Processing file: " + relativePath);
+  
+  try {
+    var content = fs.readFile(file.path);
+    var parsedContent = functionParser.parse(content);  
+    var guidFromFile = parsedContent.guid;
+    var item = functionParser.updateFrom(parsedContent);
+    var guidFromItem = item.id;
 
-  // Update the file if the GUIDs differ.
-  if (guidFromFile !== guidFromItem)
-    fs.writeFile(file.path, functionParser.insertBodyText(content, guidFromItem));
+    // Update the file if the GUIDs differ.
+    if (guidFromFile !== guidFromItem)
+      fs.writeFile(file.path, functionParser.insertBodyText(content, guidFromItem));
 
-  // Add to accumulator to detect items to delete.
-  accumulator[guidFromItem] = true;
+    // Add to accumulator to detect items to delete.
+    accumulator[guidFromItem] = true;
+  } catch (e) {
+    log.error("Cannot process file: " + relativePath + " Error: " + e.message);
+  }
+  
   return accumulator;
 }
 ]]>

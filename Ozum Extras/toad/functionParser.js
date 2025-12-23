@@ -60,6 +60,7 @@ function _updateFrom(item, parsed) {
 
   item.schema = schema;
   item.generateSQLOnly = false;
+  item.loadedAt = new Date();
 
   for (var key in parsed) {
     if (!(SKIP[key] === "ALL" || SKIP[key] === parsed.type)) {
@@ -223,25 +224,16 @@ function parse(functionSQL, filePath) {
   result.sql = bodyInfo.bodyText;
   result.asClause = bodyInfo.literal;
   result.filePath = filePath;
+  result.fromFile = true;
   result.guid = extractGUID(functionSQL);
   result.comments = commentText;
 
   return result;
 }
 
-/**
- * Extracts the first `@GUID {....}` marker from a SQL body, preserving braces.
- * Returns `undefined` when the marker is missing or the input is falsy.
- *
- * @param {string} bodyText - Raw SQL text (e.g., CREATE FUNCTION block).
- * @returns {string|undefined} Canonical GUID with braces when present.
- *
- * @example
- *   extractGUID('BEGIN\n  -- @GUID {9968C379-A8C4-4D5A-9F23-4F79E7C3B5E9}\nEND;');
- *   // => "{9968C379-A8C4-4D5A-9F23-4F79E7C3B5E9}"
- */
 function extractGUID(bodyText) {
   if (!bodyText) return undefined;
+  //var TOAD_ID_REGEX = /toad:id\s*=\s*([A-Za-z0-9_-]+)/i;
   var GUID_REGEX = /\@GUID\s*(\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\})/i;
   var match = GUID_REGEX.exec(bodyText);
   return match ? match[1] : undefined;
@@ -629,7 +621,7 @@ function insertBodyText(functionSql, guid) {
   var updatedBody = _replaceGuidLine(body, markerLine);
 
   if (!updatedBody) {
-    var annotatedMarker = "-- " + markerLine + " - DON'T CHANGE THIS LINE! TOAD Data Modeler uses this ID in sync.";
+    var annotatedMarker = "-- " + markerLine + " - DON'T CHANGE THIS LINE! TOAD Data Modeler ID used in sync.";
     if (/\bLANGUAGE\s+"?plpgsql"?/i.test(windowsSql))
       updatedBody = _insertAfterBeginLine(body, annotatedMarker);
     else updatedBody = _insertAfterOpeningLine(body, annotatedMarker);

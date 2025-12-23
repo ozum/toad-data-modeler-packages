@@ -14,7 +14,7 @@ CREATE OR REPLACE FUNCTION util.test_parser_attributes (
 DECLARE
 	v_now timestamptz := clock_timestamp();
 BEGIN
-	-- @GUID {5D445D0D-7F77-4274-ADA2-9A102FB93080} - DON'T CHANGE THIS LINE! TOAD Data Modeler ID used in sync.
+	-- @GUID {69F05895-E35D-491B-8BA0-1561DD60FCD0} - DON'T CHANGE THIS LINE! TOAD Data Modeler ID used in sync.
 	result_code := 1;
 	result_text := format('Account: %s Amount: %s Label: %s Time: %s', "accountId", p_amount, p_label, v_now);
 	RETURN NEXT;
@@ -29,4 +29,6 @@ Demonstrates every parser attribute:
 - SECURITY DEFINER & LEAKPROOF
 - embedded Toad:ID hint inside the body
 $$;
+
+
 

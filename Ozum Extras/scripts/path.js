@@ -66,3 +66,51 @@ function parse(filePath) {
     name: baseName(filePath, extension)
   };
 }
+
+/**
+ * Gets the relative path from one absolute path to another (Windows-style separators).
+ * Falls back to the target path unchanged when the two locations live on different drives.
+ *
+ * @param {string} fromPath - Starting absolute path.
+ * @param {string} toPath   - Destination absolute path.
+ * @returns {string}        - Relative path (e.g., "..\\scripts\\file.sql") or the destination when no relative path exists.
+ *
+ * @example
+ * relative("C:\\models\\db-lib\\functions", "C:\\models\\scripts\\macro.js"); // "..\\scripts\\macro.js"
+ */
+function relative(fromPath, toPath) {
+  if (!fromPath || !toPath) return "";
+
+  var from = _normalizePath(fromPath);
+  var to = _normalizePath(toPath);
+
+  var fromInfo = _splitPath(from);
+  var toInfo = _splitPath(to);
+
+  // Different drives or UNC roots cannot be expressed relatively.
+  if (fromInfo.root.toLowerCase() !== toInfo.root.toLowerCase()) return to;
+
+  var commonLength = 0;
+  var maxCommon = Math.min(fromInfo.parts.length, toInfo.parts.length);
+  while (commonLength < maxCommon && fromInfo.parts[commonLength].toLowerCase() === toInfo.parts[commonLength].toLowerCase())
+    commonLength += 1;
+
+  var up = [];
+  for (var i = commonLength; i < fromInfo.parts.length; i++) up.push("..");
+  var down = toInfo.parts.slice(commonLength);
+  var segments = up.concat(down);
+  if (!segments.length) return ".";
+  return segments.join("\\");
+}
+
+function _normalizePath(pathValue) {
+  return (pathValue || "").replace(/\//g, "\\");
+}
+
+function _splitPath(value) {
+  var match = value.match(/^([A-Za-z]:|\\\\[^\\]+\\[^\\]+)/);
+  var root = match ? match[0] : "";
+  var remainder = value.slice(root.length).replace(/^\\+|\\+$/g, "");
+  var parts = remainder ? remainder.split(/\\+/) : [];
+  return { root: root, parts: parts };
+}
