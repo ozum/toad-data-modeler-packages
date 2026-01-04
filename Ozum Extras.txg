@@ -434,13 +434,28 @@ function parse(functionSQL, filePath) {
   if (!createInfo) return undefined;
 
   var commentInfo = _extractTrailingComment(normalized, createInfo.startIndex);
-  var definitionSection = commentInfo
-    ? normalized.slice(createInfo.startIndex, commentInfo.commentIndex)
-    : normalized.slice(createInfo.startIndex);
   var commentText = commentInfo ? commentInfo.comment : undefined;
-  var afterScript = commentInfo
-    ? string.trim(commentInfo.after, { emptyLinesOnly: true })
-    : "";
+
+  var definitionSection;
+  var afterScript;
+  if (commentInfo) {
+    definitionSection = normalized.slice(
+      createInfo.startIndex,
+      commentInfo.commentIndex
+    );
+    afterScript = string.trim(commentInfo.after, { emptyLinesOnly: true });
+  } else {
+    var statementEndIndex = _findStatementEnd(normalized, createInfo.startIndex);
+    if (statementEndIndex === -1) statementEndIndex = normalized.length;
+    definitionSection = normalized.slice(
+      createInfo.startIndex,
+      statementEndIndex
+    );
+    afterScript = string.trim(
+      normalized.slice(statementEndIndex),
+      { emptyLinesOnly: true }
+    );
+  }
 
   var statement = definitionSection;
   var createTokenEnd = createInfo.afterKeywordIndex - createInfo.startIndex;
@@ -564,6 +579,26 @@ function _extractTrailingComment(sql, createIndex) {
     comment: _unquoteCommentLiteral(match[2]),
     after: match[3]
   };
+}
+
+function _findStatementEnd(text, startIndex) {
+  if (typeof startIndex !== "number" || startIndex < 0) return -1;
+  var ctx = _createScanContext();
+  for (var i = startIndex; i < text.length; i += 1) {
+    ctx.advance(text, i);
+    if (ctx.skipLength > 0) {
+      i += ctx.skipLength - 1;
+      ctx.skipLength = 0;
+      continue;
+    }
+    if (ctx.isActive()) {
+      continue;
+    }
+    if (text.charAt(i) === ";") {
+      return i + 1;
+    }
+  }
+  return -1;
 }
 
 function _unquoteCommentLiteral(literal) {
