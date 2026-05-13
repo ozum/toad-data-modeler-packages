@@ -1,0 +1,419 @@
+﻿<?xml version="1.0"?>
+<Package ObjectType="106" CSAOName="Package" CSAOCaption="TPackageFactory" Version="1.30">
+	<Id>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</Id>
+	<Name>PostgreSQL Virtual Column</Name>
+	<Ordinal>0</Ordinal>
+	<GlobalOrder>0</GlobalOrder>
+	<Description/>
+	<Version>1.6</Version>
+	<Basic>0</Basic>
+	<DontLoad>0</DontLoad>
+	<System>0</System>
+	<AutoIncrementVersion>0</AutoIncrementVersion>
+	<Language>---</Language>
+	<MultiDBPlatform>0</MultiDBPlatform>
+	<Dependencies>
+		<Id>{ED1A043B-93F2-4613-8811-6982C8156F59}</Id>
+	</Dependencies>
+	<Scripts>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{72DB6618-F4CF-40E8-98B5-CA44607BAB2D}</Id>
+			<Name>PERCodeGeneratorPG12_stored_generated</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[function CreateTable(table, otherName, arrAttrChangedUDTName) {
+  var sql = removeGeneratedStored(table, otherName, arrAttrChangedUDTName);
+  return sql; 
+}
+
+
+// This function removes STORED keyword from non-stored generated attributes.
+// Toad Data Modeler does not have "Stored" option out of the box.
+// We added a custom attribute "storedVirtual" using meta model
+// and customized attribute for as necessary to this function work.
+function removeGeneratedStored(table, otherName, arrAttrChangedUDTName) {
+  var sql = Instance.CreateTable(table, otherName, arrAttrChangedUDTName);
+  
+  for (var i = 0; i < table.attributes.count; i++) {
+    var attribute = table.attributes.getObject(i);
+    if (attribute.useGenerated && attribute.storedVirtual)
+      sql = sql.replace(new RegExp("(" + attribute.name + "(.|(\r\n))+?) STORED", "i"), "$1 VIRTUAL");   
+  }
+    
+  return sql;
+}; ]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption/>
+			<Parent>
+				<Id>{8092F38A-5B38-41B0-8B57-6A38AA96AAA9}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{F514BE09-93FA-4E19-9E3E-FFEC72DB51DF}</Id>
+			</Visibilities>
+		</Script>
+	</Scripts>
+	<PartialFormDefs>
+		<PartialFormDefinition ObjectType="102" CSAOName="PartialFormDefinition" CSAOCaption="TPartialFormDefFactory">
+			<Id>{6374C546-EE88-4428-A0F0-FE6D0FB902AD}</Id>
+			<Name>FmPERAttributeEdit</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<FormId>{CAFCE73F-3FF9-4367-A05E-1D91D33AF0DE}</FormId>
+			<Components>
+				<DCbAttributeCollation ObjectType="559" Modified="Mod">
+					<Id>{52D72F86-27F3-4AAF-9B1E-19BA065334C4}</Id>
+					<Name>DCbAttributeCollation</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+					<ItemHeight>13</ItemHeight>
+					<Owner>FmPERAttributeEdit.PaCenter.PcGeneral.TsGeneral.GbOtherDatabaseSpecific.pnlCollation</Owner>
+				</DCbAttributeCollation>
+				<DChStoredVirtual ObjectType="511">
+					<Id>{65724913-4C26-4EDE-916C-7C8354687FD2}</Id>
+					<Name>DChStoredVirtual</Name>
+					<ObjectExists>0</ObjectExists>
+					<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+					<DeleteAble>1</DeleteAble>
+					<Left>120</Left>
+					<Top>24</Top>
+					<Width>57</Width>
+					<Height>17</Height>
+					<Visible>1</Visible>
+					<Hint/>
+					<AutoEnableProperty/>
+					<TabOrder>2</TabOrder>
+					<TabStop>1</TabStop>
+					<Alignment>taRightJustify</Alignment>
+					<AllowGrayed>0</AllowGrayed>
+					<Anchors>
+						<Item>left#-1</Item>
+						<Item>top#-1</Item>
+						<Item>right#0</Item>
+						<Item>bottom#0</Item>
+					</Anchors>
+					<ShowHint>0</ShowHint>
+					<Caption>Virtual</Caption>
+					<WordWrap>0</WordWrap>
+					<StoreDirectly>1</StoreDirectly>
+					<DataField>StoredVirtual</DataField>
+					<DataSource>Attribute</DataSource>
+					<Owner>FmPERAttributeEdit.PaCenter.PcGeneral.TsGenerated.GbGenerated</Owner>
+				</DChStoredVirtual>
+				<DEdAttributeAttrArrDims ObjectType="563" Modified="Mod">
+					<Id>{E16FFDFE-821D-4C4E-B943-1FCA83FF2FED}</Id>
+					<Name>DEdAttributeAttrArrDims</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+					<Text>
+<![CDATA[1]]>
+					</Text>
+					<Value>1</Value>
+					<Owner>FmPERAttributeEdit.PaCenter.PcGeneral.TsGeneral.GbAttributeArrayType.pnlArrayDim</Owner>
+				</DEdAttributeAttrArrDims>
+				<DSbAttributeGeneratedType ObjectType="504" Modified="Mod">
+					<Id>{92166DA1-7D89-46A7-8094-7270ED75598A}</Id>
+					<Name>DSbAttributeGeneratedType</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+					<ItemHeight>13</ItemHeight>
+					<Owner>FmPERAttributeEdit.PaCenter.PcGeneral.TsGenerated.GBIdentity</Owner>
+				</DSbAttributeGeneratedType>
+				<ImHideNavigator ObjectType="507" Modified="Mod">
+					<Id>{F7D3B6D1-14BD-49CF-8E25-D5AA07DC322C}</Id>
+					<Name>ImHideNavigator</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+					<Left>606</Left>
+					<Visible>1</Visible>
+					<Owner>FmPERAttributeEdit.PaBtnNavigatorBar</Owner>
+				</ImHideNavigator>
+				<ImShowNavigator ObjectType="507" Modified="Mod">
+					<Id>{9009D255-8940-4B4F-B051-DDEA265BA223}</Id>
+					<Name>ImShowNavigator</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+					<Left>594</Left>
+					<Visible>0</Visible>
+					<Owner>FmPERAttributeEdit.PaBtnNavigatorBar</Owner>
+				</ImShowNavigator>
+				<PaCenter ObjectType="532" Modified="Mod">
+					<Id>{BDB42BBC-0847-47AE-B22A-A143F275EDF7}</Id>
+					<Name>PaCenter</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+					<Components>
+						<PcGeneral ObjectType="530" Modified="Mod">
+							<Id>{CA707746-4672-4984-8E2E-F5B9D8F2AB35}</Id>
+							<Name>PcGeneral</Name>
+							<ObjectExists>1</ObjectExists>
+							<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+							<Components>
+								<TsCheckConstraints ObjectType="541" Modified="Mod">
+									<Id>{6C747CF8-ED0C-4C6A-BC55-F5A4E12DC5FE}</Id>
+									<Name>TsCheckConstraints</Name>
+									<ObjectExists>1</ObjectExists>
+									<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+									<Components>
+										<GrCheckConstraints ObjectType="544" Modified="Mod">
+											<Id>{D97DCFB2-0DE2-4F64-B8D0-5CFC643925BA}</Id>
+											<Name>GrCheckConstraints</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+											<Height>431</Height>
+											<Owner>FmPERAttributeEdit.PaCenter.PcGeneral.TsCheckConstraints</Owner>
+										</GrCheckConstraints>
+										<PaCheckConstraintButtons ObjectType="532" Modified="Mod">
+											<Id>{DBBC03E1-DEDA-43BC-90E2-0B82F237DC5D}</Id>
+											<Name>PaCheckConstraintButtons</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+											<Components/>
+											<Top>431</Top>
+											<Owner>FmPERAttributeEdit.PaCenter.PcGeneral.TsCheckConstraints</Owner>
+										</PaCheckConstraintButtons>
+									</Components>
+									<Height>469</Height>
+									<Caption>
+<![CDATA[Check Constraints]]>
+									</Caption>
+									<Owner>FmPERAttributeEdit.PaCenter.PcGeneral</Owner>
+								</TsCheckConstraints>
+								<TsForeignKeys ObjectType="541" Modified="Mod">
+									<Id>{31A9393E-6B70-4165-B490-50EF03FC354F}</Id>
+									<Name>TsForeignKeys</Name>
+									<ObjectExists>1</ObjectExists>
+									<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+									<Components/>
+									<Height>469</Height>
+									<Caption>
+<![CDATA[Foreign Keys]]>
+									</Caption>
+									<Owner>FmPERAttributeEdit.PaCenter.PcGeneral</Owner>
+								</TsForeignKeys>
+								<TsGeneral ObjectType="541" Modified="Mod">
+									<Id>{8CB72921-7E68-454C-BCAE-8A7415D9D474}</Id>
+									<Name>TsGeneral</Name>
+									<ObjectExists>1</ObjectExists>
+									<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+									<Components>
+										<CbDefaults ObjectType="559" Modified="Mod">
+											<Id>{907D5207-4E52-48B0-99A9-0E70124E5A43}</Id>
+											<Name>CbDefaults</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+											<ItemHeight>13</ItemHeight>
+											<Owner>FmPERAttributeEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+										</CbDefaults>
+										<CbDomains ObjectType="559" Modified="Mod">
+											<Id>{E4494F06-F303-481C-9785-25D9E1BAB922}</Id>
+											<Name>CbDomains</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+											<ItemHeight>13</ItemHeight>
+											<Owner>FmPERAttributeEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+										</CbDomains>
+										<DMeAttributeComments ObjectType="526" Modified="Mod">
+											<Id>{1D77A677-4161-4D4F-9A5B-60AD19164433}</Id>
+											<Name>DMeAttributeComments</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+											<Height>60</Height>
+											<Lines>
+												<Lines ObjectType="540" CSAOCaption="TCSAOStringsFactory">
+													<Id>{A5A01928-59EF-488D-912F-740AEA01B938}</Id>
+													<Name>Lines</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{00000000-0000-0000-0000-000000000000}</PackageGUID>
+													<Text>
+<![CDATA[Kayıt aktif mi?]]>
+													</Text>
+												</Lines>
+											</Lines>
+											<Owner>FmPERAttributeEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+										</DMeAttributeComments>
+										<GbAttributeArrayType ObjectType="521" Modified="Mod">
+											<Id>{49197E8E-6291-4305-B560-B72E70C75C3F}</Id>
+											<Name>GbAttributeArrayType</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+											<Components/>
+											<Top>335</Top>
+											<Owner>FmPERAttributeEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+										</GbAttributeArrayType>
+										<GbOtherDatabaseSpecific ObjectType="521" Modified="Mod">
+											<Id>{21533103-151D-4500-B18F-F36B620B590E}</Id>
+											<Name>GbOtherDatabaseSpecific</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+											<Components/>
+											<Top>335</Top>
+											<Owner>FmPERAttributeEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+										</GbOtherDatabaseSpecific>
+									</Components>
+									<Height>469</Height>
+									<Visible>0</Visible>
+									<Caption>
+<![CDATA[General]]>
+									</Caption>
+									<Owner>FmPERAttributeEdit.PaCenter.PcGeneral</Owner>
+								</TsGeneral>
+								<TsGenerated ObjectType="541" Modified="Mod">
+									<Id>{3D6AABFC-3AFA-44E7-A19B-724ECFFCB08B}</Id>
+									<Name>TsGenerated</Name>
+									<ObjectExists>1</ObjectExists>
+									<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+									<Components/>
+									<Height>469</Height>
+									<Visible>1</Visible>
+									<Owner>FmPERAttributeEdit.PaCenter.PcGeneral</Owner>
+								</TsGenerated>
+								<TsNotes ObjectType="541" Modified="Mod">
+									<Id>{EDAD7223-A712-4D26-9D4A-113D24AB53FB}</Id>
+									<Name>TsNotes</Name>
+									<ObjectExists>1</ObjectExists>
+									<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+									<Components/>
+									<Height>469</Height>
+									<Owner>FmPERAttributeEdit.PaCenter.PcGeneral</Owner>
+								</TsNotes>
+								<TsRights ObjectType="541" Modified="Mod">
+									<Id>{0B165819-8605-429B-8285-6E604DB32899}</Id>
+									<Name>TsRights</Name>
+									<ObjectExists>1</ObjectExists>
+									<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+									<Components/>
+									<Height>469</Height>
+									<Caption>
+<![CDATA[Permissions]]>
+									</Caption>
+									<Owner>FmPERAttributeEdit.PaCenter.PcGeneral</Owner>
+								</TsRights>
+							</Components>
+							<Height>497</Height>
+							<TabIndex>5</TabIndex>
+							<Owner>FmPERAttributeEdit.PaCenter</Owner>
+						</PcGeneral>
+					</Components>
+					<Top>91</Top>
+					<Height>507</Height>
+					<Owner>FmPERAttributeEdit</Owner>
+				</PaCenter>
+				<PaName ObjectType="532" Modified="Mod">
+					<Id>{2686B3B6-EE51-41F4-B400-80F30111F4F5}</Id>
+					<Name>PaName</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+					<Components/>
+					<Top>47</Top>
+					<Owner>FmPERAttributeEdit</Owner>
+				</PaName>
+				<PaTop ObjectType="532" Modified="Mod">
+					<Id>{BE8F8256-F3F3-4952-A39D-62EFB3C950F5}</Id>
+					<Name>PaTop</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{CD5ECA22-687D-4399-ABF6-E8E5C1EF11C2}</PackageGUID>
+					<Components/>
+					<Visible>1</Visible>
+					<Hint>Hide Navigator Panel</Hint>
+					<Owner>FmPERAttributeEdit</Owner>
+				</PaTop>
+			</Components>
+		</PartialFormDefinition>
+	</PartialFormDefs>
+	<Extensions>
+		<Id>{3D9BD247-234F-4378-8F63-EF7602BD966F}</Id>
+	</Extensions>
+	<ExtCSAOClassDefs>
+		<ExternalClass ObjectType="103" CSAOName="ExternalClass" CSAOCaption="TExtCSAOClassDefFactory">
+			<Id>{0E377981-40ED-4F10-BAB9-DBBDCD2F2C3B}</Id>
+			<Name>PERAttributePG12</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ParentFactoryName/>
+			<ParentClassType>0</ParentClassType>
+			<DefaultName/>
+			<CSAOObjectType>2003</CSAOObjectType>
+			<Abstract>0</Abstract>
+			<CSAOClassCaption/>
+			<Members>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{06F6564B-B0CB-4DD1-8425-7B56A8325D7C}</Id>
+					<Name>StoredVirtual</Name>
+					<Attributes>
+						<Item>1</Item>
+						<Item>3</Item>
+					</Attributes>
+					<Caption>StoredVirtual</Caption>
+					<DataType>Boolean</DataType>
+					<DefaultValue Variant="Boolean">1</DefaultValue>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod/>
+					<SetMethod/>
+				</IExternalProperty>
+			</Members>
+		</ExternalClass>
+		<ExternalClass ObjectType="103" CSAOName="ExternalClass" CSAOCaption="TExtCSAOClassDefFactory">
+			<Id>{86972339-80E9-421D-AC35-F3A09A66FEBF}</Id>
+			<Name>PERCodeGeneratorPG12</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ParentFactoryName/>
+			<ParentClassType>0</ParentClassType>
+			<DefaultName/>
+			<CSAOObjectType>2027</CSAOObjectType>
+			<Abstract>0</Abstract>
+			<CSAOClassCaption/>
+			<Members>
+				<IExternalFunction ObjectType="403" CSAOCaption="TCSAOExtFunctionWrapperFactory">
+					<Id>{1B278D18-99C2-472A-BA1D-737488ECA644}</Id>
+					<Name>CreateTable</Name>
+					<Parameters>
+						<IParameter ObjectType="410" CSAOCaption="TCSAOParamDefWrapperFactory">
+							<Name>Table</Name>
+							<Id>{00000000-0000-0000-0000-000000000000}</Id>
+							<DataType>Dispatch</DataType>
+						</IParameter>
+						<IParameter ObjectType="410" CSAOCaption="TCSAOParamDefWrapperFactory">
+							<Name>OtherName</Name>
+							<Id>{00000000-0000-0000-0000-000000000000}</Id>
+							<DataType>String</DataType>
+						</IParameter>
+						<IParameter ObjectType="410" CSAOCaption="TCSAOParamDefWrapperFactory">
+							<Name>arrAttrChangedUDTName</Name>
+							<Id>{00000000-0000-0000-0000-000000000000}</Id>
+							<DataType>Dispatch</DataType>
+						</IParameter>
+					</Parameters>
+					<Method>
+						<IMethod ObjectType="407" CSAOCaption="TCSAOExternalSourceWrapperFactory">
+							<Language/>
+							<Method>PERCodeGeneratorPG12_stored_generated.CreateTable</Method>
+						</IMethod>
+					</Method>
+					<Result>
+						<IResult ObjectType="411" CSAOCaption="TCSAOParamDefWrapperFactory">
+							<Name/>
+							<Id>{00000000-0000-0000-0000-000000000000}</Id>
+							<DataType>String</DataType>
+						</IResult>
+					</Result>
+				</IExternalFunction>
+			</Members>
+		</ExternalClass>
+	</ExtCSAOClassDefs>
+	<VisibilityDefinition/>
+	<Visibilities>
+		<Id>{F514BE09-93FA-4E19-9E3E-FFEC72DB51DF}</Id>
+	</Visibilities>
+</Package>

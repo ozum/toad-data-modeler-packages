@@ -1,0 +1,434 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Package ObjectType="106" CSAOName="Package" CSAOCaption="TPackageFactory" Version="1.30">
+	<Id>{4B98B7DB-6DA0-4703-9655-3C141FC48200}</Id>
+	<Name>AddParentTableNameToFKColumn</Name>
+	<Ordinal>0</Ordinal>
+	<GlobalOrder>0</GlobalOrder>
+	<Description/>
+	<Version>1.16</Version>
+	<Basic>0</Basic>
+	<DontLoad>0</DontLoad>
+	<System>0</System>
+	<AutoIncrementVersion>1</AutoIncrementVersion>
+	<Language/>
+	<MultiDBPlatform>0</MultiDBPlatform>
+	<Extensions>
+		<Id>{C03DCDA0-1475-4DE6-A88E-D16A1B263CD3}</Id>
+	</Extensions>
+	<Macros>
+		<Macro ObjectType="121" CSAOName="Macro" CSAOCaption="Macro">
+			<Id>{01AB6978-21B0-48CE-A9CC-B82B378CE4C3}</Id>
+			<Name>AddParentTableNameToFKColumnMacro</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[function Main() {
+
+    // https://blog.toadworld.com/how-to-add-parent-table-name-to-fk-columns-at-once
+
+
+
+
+
+    var lcFirst = function(input) {
+
+
+
+        return input.charAt(0).toLowerCase() + input.slice(1)
+
+
+
+    }
+
+
+
+    
+
+
+
+    var ucFirst = function(input) {
+
+
+
+        return input.charAt(0).toUpperCase() + input.slice(1)
+
+
+
+    }
+
+
+
+    
+
+
+
+    var isTenantAttribute = function(input) {
+
+
+
+        return input.indexOf('organization') > -1 || input.indexOf('businessUnit') > -1
+
+
+
+    }
+
+
+
+
+
+
+
+    var App = System.GetInterface("Application");
+
+
+
+    var Model = App.ActiveModel;
+
+
+
+    var WS = App.ActiveWorkSpace;
+
+
+
+    var Log = System.CreateObject("Log");
+
+
+
+
+
+
+
+    if (Model == null)
+
+
+
+        return;
+
+
+
+    if (WS == null)
+
+
+
+        return;
+
+
+
+
+
+
+
+
+
+
+
+    var SelectedObjects, ObjectsToIterate;
+
+
+
+    SelectedObjects = This;
+
+
+
+    if ((SelectedObjects == null) || (SelectedObjects.Count == 0)) {
+
+
+
+        if (System
+
+
+
+                .ShowMessageDialog(
+
+
+
+                1004,
+
+
+
+                'WarningDialog',
+
+
+
+                'No relationship was selected. Do you wish to run the macro for all relationships?',
+
+
+
+                3, 3) == 6) {
+
+
+
+            ObjectsToIterate = Model.Relations;
+
+
+
+        } else {
+
+
+
+            return;
+
+
+
+        }
+
+
+
+    } else {
+
+
+
+        ObjectsToIterate = SelectedObjects;
+
+
+
+    }
+
+
+
+
+
+
+
+    var i, SelectedObject, IteratedRelationship, ParentAttr, ChildAttr, ParentTblName;
+
+
+
+    // iterate relationships
+
+
+
+    Model.Lock();
+
+
+
+
+
+
+
+    for (i = 0; i < ObjectsToIterate.Count; i++) {
+
+
+
+        IteratedRelationship = null;
+
+
+
+        SelectedObject = ObjectsToIterate.GetObject(i);
+
+
+
+        if (SelectedObject.ObjectType === 2504) // relation line selected on
+
+
+
+                // WorkSpace
+
+
+
+                {
+
+
+
+                    IteratedRelationship = SelectedObject.ParentBase;
+
+
+
+                } else if (SelectedObject.ObjectType === 2004) // relation selected
+
+
+
+                // in Model Explorer
+
+
+
+                        // or Object Viewer
+
+
+
+                        {
+
+
+
+                            IteratedRelationship = SelectedObject;
+
+
+
+                        }
+
+
+
+
+
+
+
+                if (IteratedRelationship !== null) {
+
+
+
+
+
+
+
+                    for (f = 0; f < IteratedRelationship.ForeignKeys.Count; f++)
+
+
+
+                    {       
+
+  
+
+
+
+                        ParentAttr = IteratedRelationship.ForeignKeys.GetObject(f).AttrParent;
+
+
+
+                        ChildAttr = IteratedRelationship.ForeignKeys.GetObject(f).AttrChild;
+
+
+
+                                                
+
+
+
+                        if (isTenantAttribute(ParentAttr.Name))
+
+
+
+                        {
+
+
+
+                          ChildAttr.Name = ParentAttr.Name;
+
+
+
+                        }
+
+
+
+                        else if(ChildAttr.Name.indexOf(ParentAttr.Owner.Name) === -1) 
+
+
+
+                        {
+
+
+
+                          ChildAttr.Name = lcFirst(ParentAttr.Owner.Name)+ucFirst(ParentAttr.Name);   
+
+
+
+                        }                                  
+
+
+
+                        
+
+
+
+                        if (isTenantAttribute(ParentAttr.Caption))
+
+
+
+                        {
+
+
+
+                          ChildAttr.Caption = ParentAttr.Caption;
+
+
+
+                        }                        
+
+
+
+                        else if(ChildAttr.Caption.indexOf(ParentAttr.Owner.Caption) === -1) 
+
+
+
+                        {
+
+
+
+                          ChildAttr.Caption = lcFirst(ParentAttr.Owner.Caption) + ucFirst(ParentAttr.Caption);
+
+
+
+                        }
+
+
+
+                        Log.Information('Success: Name of key attribute in was changed to ' + ChildAttr.Name + '.');
+
+
+
+                    }
+
+
+
+                }
+
+
+
+            }
+
+
+
+    Model.UnLock();
+
+
+
+    Model.RefreshModel();
+
+
+
+    Log.Information("DONE");
+
+
+
+}]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>Rename FK Column</Caption>
+			<Parent>
+				<Id>{FA6F16A6-3FA3-4B0A-8290-7FD8AC47017B}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{421DCB12-C6C4-4D35-99E0-6BF13DE6ED59}</Id>
+			</Visibilities>
+			<RegisterOrder>15</RegisterOrder>
+			<AddToPopUpMenu>1</AddToPopUpMenu>
+			<MenuPath>Macros</MenuPath>
+			<AddToMenu>1</AddToMenu>
+			<AlwaysAddToMainMenu>0</AlwaysAddToMainMenu>
+			<SupportedAllObjectTypes>0</SupportedAllObjectTypes>
+			<PopUpMenuPath/>
+			<LERSupportedAllObjectTypes>0</LERSupportedAllObjectTypes>
+			<PERSupportedAllObjectTypes>0</PERSupportedAllObjectTypes>
+			<BlockUndo>1</BlockUndo>
+			<ClearUndo>1</ClearUndo>
+			<ObjectTypes>
+				<ObjectType>
+					<Value>2004</Value>
+				</ObjectType>
+				<ObjectType>
+					<Value>2504</Value>
+				</ObjectType>
+			</ObjectTypes>
+		</Macro>
+	</Macros>
+	<VisibilityDefinition/>
+	<Visibilities>
+		<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+	</Visibilities>
+</Package>

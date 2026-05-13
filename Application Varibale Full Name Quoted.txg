@@ -1,0 +1,147 @@
+﻿<?xml version="1.0"?>
+<Package ObjectType="106" CSAOName="Package" CSAOCaption="TPackageFactory" Version="1.30">
+	<Id>{44B362C7-ACA2-403E-A0D3-599CC913B90A}</Id>
+	<Name>Application Variable Full Name Quoted</Name>
+	<Ordinal>0</Ordinal>
+	<GlobalOrder>0</GlobalOrder>
+	<Description/>
+	<Version>1.2</Version>
+	<Basic>0</Basic>
+	<DontLoad>0</DontLoad>
+	<System>0</System>
+	<AutoIncrementVersion>0</AutoIncrementVersion>
+	<Language>---</Language>
+	<MultiDBPlatform>0</MultiDBPlatform>
+	<Scripts>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{C015577D-6289-4206-B1DC-F459D7F7EF09}</Id>
+			<Name>PEREntity_Variable</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[function GetFullNameQuoted() {
+  var ownerName = Instance.schema ? '"' + Instance.schema.name + '".' : '';
+  var name = '"' + Instance.name + '"';
+  return ownerName + name;
+};
+
+function GetSchemaNameQuoted() {
+  return Instance.schema ? '"' + Instance.schema.name + '"' : '';
+}
+
+function GetSchemaName() {
+  return Instance.schema ? Instance.schema.name : '';
+}
+
+function GetSchemaNameQuotedDot() {
+  return Instance.schema ? '"' + Instance.schema.name + '".' : '';
+}]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption/>
+			<Parent>
+				<Id>{8092F38A-5B38-41B0-8B57-6A38AA96AAA9}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{421DCB12-C6C4-4D35-99E0-6BF13DE6ED59}</Id>
+			</Visibilities>
+		</Script>
+	</Scripts>
+	<Extensions>
+		<Id>{C03DCDA0-1475-4DE6-A88E-D16A1B263CD3}</Id>
+	</Extensions>
+	<ExtCSAOClassDefs>
+		<ExternalClass ObjectType="103" CSAOName="ExternalClass" CSAOCaption="TExtCSAOClassDefFactory">
+			<Id>{7885B4F8-50BB-4E2A-8AAC-F70A1B24791D}</Id>
+			<Name>PEREntity</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ParentFactoryName/>
+			<ParentClassType>0</ParentClassType>
+			<DefaultName/>
+			<CSAOObjectType>2002</CSAOObjectType>
+			<Abstract>0</Abstract>
+			<CSAOClassCaption/>
+			<Members>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{B52A1C88-E0FC-4CF6-82EC-8820463BF89E}</Id>
+					<Name>FullNameQuoted</Name>
+					<Attributes>
+						<Item>48</Item>
+					</Attributes>
+					<Caption>Full Name Quoted</Caption>
+					<DataType>String</DataType>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod>
+						<IGetMethod ObjectType="405" CSAOCaption="TCSAOExternalSourceWrapperFactory">
+							<Language/>
+							<Method>PEREntity_Variable.GetFullNameQuoted</Method>
+						</IGetMethod>
+					</GetMethod>
+					<SetMethod/>
+				</IExternalProperty>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{B385C79A-392E-4FEA-975D-86D31E5D9A86}</Id>
+					<Name>SchemaName</Name>
+					<Attributes/>
+					<Caption>SchemaName</Caption>
+					<DataType>String</DataType>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod>
+						<IGetMethod ObjectType="405" CSAOCaption="TCSAOExternalSourceWrapperFactory">
+							<Language/>
+							<Method>PEREntity_Variable.GetSchemaName</Method>
+						</IGetMethod>
+					</GetMethod>
+					<SetMethod/>
+				</IExternalProperty>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{80CA534F-ADD2-4626-828F-97CB9F711851}</Id>
+					<Name>SchemaNameQuoted</Name>
+					<Attributes/>
+					<Caption>Schema Name Quoted</Caption>
+					<DataType>String</DataType>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod>
+						<IGetMethod ObjectType="405" CSAOCaption="TCSAOExternalSourceWrapperFactory">
+							<Language/>
+							<Method>PEREntity_Variable.GetSchemaNameQuoted</Method>
+						</IGetMethod>
+					</GetMethod>
+					<SetMethod/>
+				</IExternalProperty>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{A353FDA1-38D2-4B2F-843B-3F343C8996B4}</Id>
+					<Name>SchemaNameQuotedDot</Name>
+					<Attributes/>
+					<Caption>Schema Name Quoted Dot</Caption>
+					<DataType>String</DataType>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod>
+						<IGetMethod ObjectType="405" CSAOCaption="TCSAOExternalSourceWrapperFactory">
+							<Language/>
+							<Method>PEREntity_Variable.GetSchemaNameQuotedDot</Method>
+						</IGetMethod>
+					</GetMethod>
+					<SetMethod/>
+				</IExternalProperty>
+			</Members>
+		</ExternalClass>
+	</ExtCSAOClassDefs>
+	<VisibilityDefinition/>
+	<Visibilities>
+		<Id>{421DCB12-C6C4-4D35-99E0-6BF13DE6ED59}</Id>
+	</Visibilities>
+</Package>

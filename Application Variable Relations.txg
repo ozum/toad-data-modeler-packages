@@ -1,0 +1,147 @@
+﻿<?xml version="1.0"?>
+<Package ObjectType="106" CSAOName="Package" CSAOCaption="TPackageFactory" Version="1.30">
+	<Id>{BEAE286A-F1D7-4F0C-8D8B-DE709155FF88}</Id>
+	<Name>Application Variable Relations</Name>
+	<Ordinal>0</Ordinal>
+	<GlobalOrder>0</GlobalOrder>
+	<Description/>
+	<Version>1.4</Version>
+	<Basic>0</Basic>
+	<DontLoad>0</DontLoad>
+	<System>0</System>
+	<AutoIncrementVersion>0</AutoIncrementVersion>
+	<Language>---</Language>
+	<MultiDBPlatform>0</MultiDBPlatform>
+	<Scripts>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{300B1CDE-927A-4827-841E-1D04F0B378CB}</Id>
+			<Name>PERRelation_Variable</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[function SingularizeName(name)
+{
+  if (name == null) return "";
+
+  var s = "" + name;
+  var lower = s.toLowerCase();
+
+  if (lower == "people") return "person";
+  if (lower == "children") return "child";
+  if (lower == "statuses") return s.substr(0, s.length - 2);
+
+  // companies -> company
+  if (s.length > 3 && lower.substr(lower.length - 3) == "ies") {
+    return s.substr(0, s.length - 3) + "y";
+  }
+
+  // classes -> class, boxes -> box
+  if (
+    s.length > 2 &&
+    (
+      lower.substr(lower.length - 3) == "ses" ||
+      lower.substr(lower.length - 3) == "xes" ||
+      lower.substr(lower.length - 4) == "shes" ||
+      lower.substr(lower.length - 4) == "ches"
+    )
+  ) {
+    return s.replace(/es$/i, "");
+  }
+
+  // customers -> customer
+  if (s.length > 1 && lower.substr(lower.length - 1) == "s") {
+    return s.substr(0, s.length - 1);
+  }
+
+  return s;
+}
+
+function GetSingularParentTableName()
+{
+  if (Instance == null || Instance.ParentEntity == null) return "";
+  return SingularizeName(Instance.ParentEntity.Name);
+}
+
+function GetSingularChildTableName()
+{
+  if (Instance == null || Instance.ChildEntity == null) return "";
+  return SingularizeName(Instance.ChildEntity.Name);
+}
+]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption>Script1</Caption>
+			<Parent>
+				<Id>{FF8E8814-FCE5-423D-BDEA-814E9EF93456}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{421DCB12-C6C4-4D35-99E0-6BF13DE6ED59}</Id>
+			</Visibilities>
+		</Script>
+	</Scripts>
+	<Extensions>
+		<Id>{C03DCDA0-1475-4DE6-A88E-D16A1B263CD3}</Id>
+	</Extensions>
+	<ExtCSAOClassDefs>
+		<ExternalClass ObjectType="103" CSAOName="ExternalClass" CSAOCaption="TExtCSAOClassDefFactory">
+			<Id>{1DA34B3F-885A-45A6-9F79-D65A562B4463}</Id>
+			<Name>PERRelation</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ParentFactoryName/>
+			<ParentClassType>0</ParentClassType>
+			<DefaultName/>
+			<CSAOObjectType>2004</CSAOObjectType>
+			<Abstract>0</Abstract>
+			<CSAOClassCaption/>
+			<Members>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{B6786E83-A053-4A66-948A-C14165361BD9}</Id>
+					<Name>SingularChildTableName</Name>
+					<Attributes/>
+					<Caption>Singular Child Table Name</Caption>
+					<DataType>String</DataType>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod>
+						<IGetMethod ObjectType="405" CSAOCaption="TCSAOExternalSourceWrapperFactory">
+							<Language/>
+							<Method>PERRelation_Variable.GetSingularChildTableName</Method>
+						</IGetMethod>
+					</GetMethod>
+					<SetMethod/>
+				</IExternalProperty>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{27C531F6-8C45-4D3A-89C1-DD58EEB9A9E7}</Id>
+					<Name>SingularParentTableName</Name>
+					<Attributes>
+						<Item>48</Item>
+					</Attributes>
+					<Caption>Singular Parent Table Name</Caption>
+					<DataType>String</DataType>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod>
+						<IGetMethod ObjectType="405" CSAOCaption="TCSAOExternalSourceWrapperFactory">
+							<Language/>
+							<Method>PERRelation_Variable.GetSingularParentTableName</Method>
+						</IGetMethod>
+					</GetMethod>
+					<SetMethod/>
+				</IExternalProperty>
+			</Members>
+		</ExternalClass>
+	</ExtCSAOClassDefs>
+	<VisibilityDefinition/>
+	<Visibilities>
+		<Id>{421DCB12-C6C4-4D35-99E0-6BF13DE6ED59}</Id>
+	</Visibilities>
+</Package>

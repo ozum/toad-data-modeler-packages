@@ -1,0 +1,624 @@
+﻿<?xml version="1.0"?>
+<Package ObjectType="106" CSAOName="Package" CSAOCaption="TPackageFactory" Version="1.30">
+	<Id>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</Id>
+	<Name>PostgreSQL View</Name>
+	<Ordinal>0</Ordinal>
+	<GlobalOrder>0</GlobalOrder>
+	<Description/>
+	<Version>1.0</Version>
+	<Basic>0</Basic>
+	<DontLoad>0</DontLoad>
+	<System>0</System>
+	<AutoIncrementVersion>0</AutoIncrementVersion>
+	<Language>---</Language>
+	<MultiDBPlatform>0</MultiDBPlatform>
+	<Dependencies>
+		<Id>{ED1A043B-93F2-4613-8811-6982C8156F59}</Id>
+	</Dependencies>
+	<Scripts>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{821433DE-DEF4-4707-B675-755D9FCB7293}</Id>
+			<Name>PERCodeGeneratorPG12_View</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[function CreateView(view, flag) {
+  var sql = addOptions(view, flag);
+  return sql; 
+}
+
+
+// This function removes add "security_barrier" and "security_invoker"
+// options to views.
+function addOptions(view, flag) {
+  var sql = Instance.CreateView(view, flag);
+  var options = [];
+  
+  if (view.securityBarrier) options.push("security_barrier = on");
+  if (view.securityInvoker) options.push("security_invoker = on");
+
+  var optionsSQL = options.length > 0 ? " WITH (" + options.join(", ") + ") AS" : " AS"; 
+
+  sql = sql.replace(/ AS/i, optionsSQL);
+  return sql;
+}; ]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption/>
+			<Parent>
+				<Id>{8092F38A-5B38-41B0-8B57-6A38AA96AAA9}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{F514BE09-93FA-4E19-9E3E-FFEC72DB51DF}</Id>
+			</Visibilities>
+		</Script>
+	</Scripts>
+	<PartialFormDefs>
+		<PartialFormDefinition ObjectType="102" CSAOName="PartialFormDefinition" CSAOCaption="TPartialFormDefFactory">
+			<Id>{08645AE2-0C56-4388-9571-2FF1C6D10D41}</Id>
+			<Name>FmPERViewEdit</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<FormId>{0E83F19A-8056-4983-89E8-510B994F8E27}</FormId>
+			<Components>
+				<BbApply ObjectType="501" Modified="Mod">
+					<Id>{8C279712-C02A-4C7B-A488-7B35777DD68C}</Id>
+					<Name>BbApply</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<Enabled>0</Enabled>
+					<Owner>FmPERViewEdit.PaBottom.PaButtons</Owner>
+				</BbApply>
+				<BtNameCaption ObjectType="501" Modified="Mod">
+					<Id>{33FF6A65-108F-4DF4-A26F-1996177CEF50}</Id>
+					<Name>BtNameCaption</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<Enabled>0</Enabled>
+					<Owner>FmPERViewEdit.grpName.paNameRight</Owner>
+				</BtNameCaption>
+				<BtRightsDelete ObjectType="501" Modified="Mod">
+					<Id>{07D1EE65-A6C3-4EC1-8239-144F8AC01A66}</Id>
+					<Name>BtRightsDelete</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<Enabled>0</Enabled>
+					<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsRights.PaRightsButtons</Owner>
+				</BtRightsDelete>
+				<BtRightsEdit ObjectType="501" Modified="Mod">
+					<Id>{9AD10F62-5C6B-429D-99B5-2C094A33E249}</Id>
+					<Name>BtRightsEdit</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<Enabled>0</Enabled>
+					<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsRights.PaRightsButtons</Owner>
+				</BtRightsEdit>
+				<BtToDoItemsDelete ObjectType="501" Modified="Mod">
+					<Id>{28732DA4-96B3-4EAC-8383-F4E1EE0EBEC4}</Id>
+					<Name>BtToDoItemsDelete</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<Enabled>0</Enabled>
+					<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsToDo.PaToDoButtons</Owner>
+				</BtToDoItemsDelete>
+				<BtToDoItemsEdit ObjectType="501" Modified="Mod">
+					<Id>{912FEC0A-75B2-4EBA-95FB-3C3E1BE24486}</Id>
+					<Name>BtToDoItemsEdit</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<Enabled>0</Enabled>
+					<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsToDo.PaToDoButtons</Owner>
+				</BtToDoItemsEdit>
+				<CbTemplates ObjectType="504" Modified="Mod">
+					<Id>{476CD93F-45CA-47D6-A1E1-96AB95A15CF1}</Id>
+					<Name>CbTemplates</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<ItemHeight>13</ItemHeight>
+					<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsBeforeScript.FrTemplateComboBeforeScript</Owner>
+				</CbTemplates>
+				<CbTemplates ObjectType="504" Modified="Mod">
+					<Id>{5C3B253F-C193-4BAC-AAF4-B97F60BF9264}</Id>
+					<Name>CbTemplates</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<ItemHeight>13</ItemHeight>
+					<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsSQL.FrTemplateComboSQL</Owner>
+				</CbTemplates>
+				<CbTemplates ObjectType="504" Modified="Mod">
+					<Id>{DF259E6D-6CCA-4D96-8B9A-E28F6B4B434E}</Id>
+					<Name>CbTemplates</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<ItemHeight>13</ItemHeight>
+					<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsAfterScript.FrTemplateComboAfterScript</Owner>
+				</CbTemplates>
+				<EdAlias ObjectType="518" Modified="Mod">
+					<Id>{5B51498C-CF06-467B-A69D-8FEDC64355A6}</Id>
+					<Name>EdAlias</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<Enabled>1</Enabled>
+					<Owner>FmPERViewEdit.PaCenter.PcGeneral.TSAttributes.PaAttributes.PaTopAttributes.PaUsedAttributes.PaViewAttributeDetail</Owner>
+				</EdAlias>
+				<EdCaption ObjectType="518" Modified="Mod">
+					<Id>{01C9CCD0-B683-48D1-91D9-EE2A546B7E30}</Id>
+					<Name>EdCaption</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<Text>
+<![CDATA[View1]]>
+					</Text>
+					<Owner>FmPERViewEdit.grpName.paNameRight</Owner>
+				</EdCaption>
+				<EdName ObjectType="518" Modified="Mod">
+					<Id>{BBBA38AE-7615-40B7-A36B-ED7BD99C9419}</Id>
+					<Name>EdName</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<Text>
+<![CDATA[View1]]>
+					</Text>
+					<Owner>FmPERViewEdit.grpName.paNameLeft</Owner>
+				</EdName>
+				<FmPERViewEdit ObjectType="520" Modified="Mod">
+					<Id>{A2B2C997-6E02-4367-AFF5-D0DD40DBB363}</Id>
+					<Name>FmPERViewEdit</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<Components>
+						<grpName ObjectType="507" Modified="Mod">
+							<Id>{34B93EF8-9BED-4E61-B3FF-2A011370B7F0}</Id>
+							<Name>grpName</Name>
+							<ObjectExists>1</ObjectExists>
+							<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+							<Components/>
+							<Top>54</Top>
+							<Owner>FmPERViewEdit</Owner>
+						</grpName>
+						<PaCenter ObjectType="532" Modified="Mod">
+							<Id>{6A0D78D1-8A6C-4043-B615-C6A7E1F28A0A}</Id>
+							<Name>PaCenter</Name>
+							<ObjectExists>1</ObjectExists>
+							<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+							<Components>
+								<PcGeneral ObjectType="530" Modified="Mod">
+									<Id>{CBC5AA4F-1EE1-456D-80B2-C1307D92C44F}</Id>
+									<Name>PcGeneral</Name>
+									<ObjectExists>1</ObjectExists>
+									<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+									<Components>
+										<TsAfterScript ObjectType="541" Modified="Mod">
+											<Id>{BFF1F9C5-32CE-4991-9228-8D1242FCE614}</Id>
+											<Name>TsAfterScript</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[After Script]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TsAfterScript>
+										<TSAttributes ObjectType="541" Modified="Mod">
+											<Id>{59F036BF-221C-479A-812E-EE4F88DD198F}</Id>
+											<Name>TSAttributes</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[Attributes]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TSAttributes>
+										<TsBeforeScript ObjectType="541" Modified="Mod">
+											<Id>{E388440B-F78E-4169-9ABA-115678A07DC4}</Id>
+											<Name>TsBeforeScript</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[Before Script]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TsBeforeScript>
+										<TsComment ObjectType="541" Modified="Mod">
+											<Id>{F00052FA-D83A-4AF5-BE78-1E3A85FB0348}</Id>
+											<Name>TsComment</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TsComment>
+										<TsGeneral ObjectType="541" Modified="Mod">
+											<Id>{F54C7C49-4C70-4ADD-9A92-3C59ED0D9C18}</Id>
+											<Name>TsGeneral</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components>
+												<CbSecurityBarrier ObjectType="511">
+													<Id>{CA8C37B3-4128-48CE-9459-673EB192286A}</Id>
+													<Name>CbSecurityBarrier</Name>
+													<ObjectExists>0</ObjectExists>
+													<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+													<DeleteAble>1</DeleteAble>
+													<Left>231</Left>
+													<Top>139</Top>
+													<Width>97</Width>
+													<Height>17</Height>
+													<Visible>1</Visible>
+													<Hint/>
+													<AutoEnableProperty/>
+													<TabOrder>6</TabOrder>
+													<TabStop>1</TabStop>
+													<Alignment>taRightJustify</Alignment>
+													<AllowGrayed>0</AllowGrayed>
+													<Anchors>
+														<Item>left#-1</Item>
+														<Item>top#-1</Item>
+														<Item>right#0</Item>
+														<Item>bottom#0</Item>
+													</Anchors>
+													<ShowHint>0</ShowHint>
+													<Caption>Security Barrier</Caption>
+													<WordWrap>0</WordWrap>
+													<StoreDirectly>1</StoreDirectly>
+													<DataField>SecurityBarrier</DataField>
+													<DataSource>View</DataSource>
+													<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+												</CbSecurityBarrier>
+												<CbSecurityInvoker ObjectType="511">
+													<Id>{07A959E1-5606-41EE-B531-964BBE42BF61}</Id>
+													<Name>CbSecurityInvoker</Name>
+													<ObjectExists>0</ObjectExists>
+													<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+													<DeleteAble>1</DeleteAble>
+													<Left>335</Left>
+													<Top>139</Top>
+													<Width>97</Width>
+													<Height>17</Height>
+													<Visible>1</Visible>
+													<Hint/>
+													<AutoEnableProperty/>
+													<TabOrder>7</TabOrder>
+													<TabStop>1</TabStop>
+													<Alignment>taRightJustify</Alignment>
+													<AllowGrayed>0</AllowGrayed>
+													<Anchors>
+														<Item>left#-1</Item>
+														<Item>top#-1</Item>
+														<Item>right#0</Item>
+														<Item>bottom#0</Item>
+													</Anchors>
+													<ShowHint>0</ShowHint>
+													<Caption>Security Invoker</Caption>
+													<WordWrap>0</WordWrap>
+													<StoreDirectly>1</StoreDirectly>
+													<DataField>SecurityInvoker</DataField>
+													<DataSource>View</DataSource>
+													<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+												</CbSecurityInvoker>
+												<PaGeneralBottom ObjectType="532" Modified="Mod">
+													<Id>{ADD47C01-A1F9-42A2-9C75-F73B99C41918}</Id>
+													<Name>PaGeneralBottom</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+													<Components>
+														<ChGenerate ObjectType="522" Modified="Mod">
+															<Id>{F13C21BB-DE13-4E49-938E-D6D00825B2AD}</Id>
+															<Name>ChGenerate</Name>
+															<ObjectExists>1</ObjectExists>
+															<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+															<Checked>1</Checked>
+															<State>cbChecked</State>
+															<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsGeneral.PaGeneralBottom</Owner>
+														</ChGenerate>
+													</Components>
+													<Top>286</Top>
+													<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+												</PaGeneralBottom>
+											</Components>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[General]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TsGeneral>
+										<TSGroup ObjectType="541" Modified="Mod">
+											<Id>{D5C55840-D9B0-4DAA-9136-BAD8D08835B1}</Id>
+											<Name>TSGroup</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[Group]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TSGroup>
+										<TSHaving ObjectType="541" Modified="Mod">
+											<Id>{595CB9EF-EAC0-4C62-9BB9-1216B07FEF04}</Id>
+											<Name>TSHaving</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[Having]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TSHaving>
+										<TsNotes ObjectType="541" Modified="Mod">
+											<Id>{F5A431D2-8AE0-4BC3-9A33-6754EB0C5D78}</Id>
+											<Name>TsNotes</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[Notes]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TsNotes>
+										<TSOrderBy ObjectType="541" Modified="Mod">
+											<Id>{0179B00B-522C-4DA8-8F6C-C4216DC19E39}</Id>
+											<Name>TSOrderBy</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[Order]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TSOrderBy>
+										<TsRights ObjectType="541" Modified="Mod">
+											<Id>{AB9B373A-BA69-4AEF-9D34-956D763D069B}</Id>
+											<Name>TsRights</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[Permissions]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TsRights>
+										<TsSQL ObjectType="541" Modified="Mod">
+											<Id>{FEC25141-BA79-4DE9-B3EC-82C412E25371}</Id>
+											<Name>TsSQL</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[SQL]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TsSQL>
+										<TsSQLPreview ObjectType="541" Modified="Mod">
+											<Id>{1519852F-3CE3-4022-B524-A9793F41802C}</Id>
+											<Name>TsSQLPreview</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TsSQLPreview>
+										<TsToDo ObjectType="541" Modified="Mod">
+											<Id>{0EFC9B8E-3131-46F5-8E22-4C0D13F91928}</Id>
+											<Name>TsToDo</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[To Do]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TsToDo>
+										<TsTriggers ObjectType="541" Modified="Mod">
+											<Id>{C0C17EC3-9ACF-4375-9646-24859700594C}</Id>
+											<Name>TsTriggers</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components>
+												<GrTriggers ObjectType="544" Modified="Mod">
+													<Id>{92D4E969-F749-40E7-BACF-4AD460ACA12E}</Id>
+													<Name>GrTriggers</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+													<Height>321</Height>
+													<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsTriggers</Owner>
+												</GrTriggers>
+												<PaTriggersButtons ObjectType="532" Modified="Mod">
+													<Id>{D01873F6-D728-46DE-B59A-00FC4B2061AF}</Id>
+													<Name>PaTriggersButtons</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+													<Components>
+														<BtTriggerDelete ObjectType="501" Modified="Mod">
+															<Id>{DA2F7A0B-7787-4B2E-AEEB-6985DA0F6DA4}</Id>
+															<Name>BtTriggerDelete</Name>
+															<ObjectExists>1</ObjectExists>
+															<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+															<Enabled>0</Enabled>
+															<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsTriggers.PaTriggersButtons</Owner>
+														</BtTriggerDelete>
+														<BtTriggerEdit ObjectType="501" Modified="Mod">
+															<Id>{E84BAC03-4D67-470D-A922-FB2B2E6882FB}</Id>
+															<Name>BtTriggerEdit</Name>
+															<ObjectExists>1</ObjectExists>
+															<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+															<Enabled>0</Enabled>
+															<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsTriggers.PaTriggersButtons</Owner>
+														</BtTriggerEdit>
+													</Components>
+													<Top>321</Top>
+													<Owner>FmPERViewEdit.PaCenter.PcGeneral.TsTriggers</Owner>
+												</PaTriggersButtons>
+											</Components>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[Triggers]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TsTriggers>
+										<TSWhere ObjectType="541" Modified="Mod">
+											<Id>{0749458F-25E7-42D9-AA59-AB3581D02E24}</Id>
+											<Name>TSWhere</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+											<Components/>
+											<Height>367</Height>
+											<Caption>
+<![CDATA[Where]]>
+											</Caption>
+											<Owner>FmPERViewEdit.PaCenter.PcGeneral</Owner>
+										</TSWhere>
+									</Components>
+									<Height>413</Height>
+									<Owner>FmPERViewEdit.PaCenter</Owner>
+								</PcGeneral>
+							</Components>
+							<Top>96</Top>
+							<Height>423</Height>
+							<Owner>FmPERViewEdit</Owner>
+						</PaCenter>
+					</Components>
+					<Left>656</Left>
+					<Top>813</Top>
+					<Caption>
+<![CDATA[View Properties]]>
+					</Caption>
+					<Owner/>
+				</FmPERViewEdit>
+				<LaAlias ObjectType="523" Modified="Mod">
+					<Id>{EF3433DF-7E0F-4DC3-BE83-A7F321EFECA0}</Id>
+					<Name>LaAlias</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{A701E1CF-5B41-4FD0-B70B-FA56AD7A00A2}</PackageGUID>
+					<Enabled>1</Enabled>
+					<Owner>FmPERViewEdit.PaCenter.PcGeneral.TSAttributes.PaAttributes.PaTopAttributes.PaUsedAttributes.PaViewAttributeDetail</Owner>
+				</LaAlias>
+			</Components>
+		</PartialFormDefinition>
+	</PartialFormDefs>
+	<Extensions>
+		<Id>{3D9BD247-234F-4378-8F63-EF7602BD966F}</Id>
+	</Extensions>
+	<ExtCSAOClassDefs>
+		<ExternalClass ObjectType="103" CSAOName="ExternalClass" CSAOCaption="TExtCSAOClassDefFactory">
+			<Id>{06584401-097E-4403-98EB-141AD91CE611}</Id>
+			<Name>PERCodeGeneratorPG12</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ParentFactoryName/>
+			<ParentClassType>0</ParentClassType>
+			<DefaultName/>
+			<CSAOObjectType>2027</CSAOObjectType>
+			<Abstract>0</Abstract>
+			<CSAOClassCaption/>
+			<Members>
+				<IExternalFunction ObjectType="403" CSAOCaption="TCSAOExtFunctionWrapperFactory">
+					<Id>{A0EA7419-EF1F-4D1C-8654-49A326F16327}</Id>
+					<Name>CreateView</Name>
+					<Parameters>
+						<IParameter ObjectType="410" CSAOCaption="TCSAOParamDefWrapperFactory">
+							<Name>View</Name>
+							<Id>{00000000-0000-0000-0000-000000000000}</Id>
+							<DataType>Dispatch</DataType>
+						</IParameter>
+						<IParameter ObjectType="410" CSAOCaption="TCSAOParamDefWrapperFactory">
+							<Name>Flag</Name>
+							<Id>{00000000-0000-0000-0000-000000000000}</Id>
+							<DataType>Integer</DataType>
+						</IParameter>
+					</Parameters>
+					<Method>
+						<IMethod ObjectType="407" CSAOCaption="TCSAOExternalSourceWrapperFactory">
+							<Language/>
+							<Method>PERCodeGeneratorPG12_View.CreateView</Method>
+						</IMethod>
+					</Method>
+					<Result>
+						<IResult ObjectType="411" CSAOCaption="TCSAOParamDefWrapperFactory">
+							<Name/>
+							<Id>{00000000-0000-0000-0000-000000000000}</Id>
+							<DataType>String</DataType>
+						</IResult>
+					</Result>
+				</IExternalFunction>
+			</Members>
+		</ExternalClass>
+		<ExternalClass ObjectType="103" CSAOName="ExternalClass" CSAOCaption="TExtCSAOClassDefFactory">
+			<Id>{6A84CCBB-9BB0-4356-AEB9-FBB7DA22C882}</Id>
+			<Name>PERViewPG110</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ParentFactoryName/>
+			<ParentClassType>0</ParentClassType>
+			<DefaultName/>
+			<CSAOObjectType>2005</CSAOObjectType>
+			<Abstract>0</Abstract>
+			<CSAOClassCaption/>
+		</ExternalClass>
+		<ExternalClass ObjectType="103" CSAOName="ExternalClass" CSAOCaption="TExtCSAOClassDefFactory">
+			<Id>{9489A21A-E13E-4D31-B76F-849AE82723B1}</Id>
+			<Name>PERViewPG12</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ParentFactoryName>PERViewPG110</ParentFactoryName>
+			<ParentClassType>2005</ParentClassType>
+			<DefaultName/>
+			<CSAOObjectType>2005</CSAOObjectType>
+			<Abstract>0</Abstract>
+			<CSAOClassCaption/>
+			<Members>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{00000000-0000-0000-0000-000000000000}</Id>
+					<Name>SecurityBarrier</Name>
+					<Attributes>
+						<Item>1</Item>
+						<Item>3</Item>
+					</Attributes>
+					<Caption>SecurityBarrier</Caption>
+					<DataType>Boolean</DataType>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod/>
+					<SetMethod/>
+				</IExternalProperty>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{BA756875-2602-4B34-9B82-9F1AC8C61B84}</Id>
+					<Name>SecurityInvoker</Name>
+					<Attributes>
+						<Item>1</Item>
+						<Item>3</Item>
+					</Attributes>
+					<Caption>SecurityInvoker</Caption>
+					<DataType>Boolean</DataType>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod/>
+					<SetMethod/>
+				</IExternalProperty>
+			</Members>
+		</ExternalClass>
+	</ExtCSAOClassDefs>
+	<VisibilityDefinition/>
+	<Visibilities>
+		<Id>{F514BE09-93FA-4E19-9E3E-FFEC72DB51DF}</Id>
+	</Visibilities>
+</Package>
