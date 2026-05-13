@@ -70,7 +70,18 @@ function GetSingularChildTableName()
   if (Instance == null || Instance.ChildEntity == null) return "";
   return SingularizeName(Instance.ChildEntity.Name);
 }
-]]>
+
+function GetSingularParentTableCaption()
+{
+  if (Instance == null || Instance.ParentEntity == null) return "";
+  return SingularizeName(Instance.ParentEntity.Caption);
+}
+
+function GetSingularChildTableCaption()
+{
+  if (Instance == null || Instance.ChildEntity == null) return "";
+  return SingularizeName(Instance.ChildEntity.Caption);
+}]]>
 			</Source>
 			<Author/>
 			<Company/>
@@ -104,6 +115,22 @@ function GetSingularChildTableName()
 			<CSAOClassCaption/>
 			<Members>
 				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{0FEDED10-862A-4A78-AF0A-55AAE8CB40E4}</Id>
+					<Name>SingularChildTableCaption</Name>
+					<Attributes/>
+					<Caption>Singular Child Table Caption</Caption>
+					<DataType>String</DataType>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod>
+						<IGetMethod ObjectType="405" CSAOCaption="TCSAOExternalSourceWrapperFactory">
+							<Language/>
+							<Method>PERRelation_Variable.GetSingularChildtTableCaption</Method>
+						</IGetMethod>
+					</GetMethod>
+					<SetMethod/>
+				</IExternalProperty>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
 					<Id>{B6786E83-A053-4A66-948A-C14165361BD9}</Id>
 					<Name>SingularChildTableName</Name>
 					<Attributes/>
@@ -115,6 +142,22 @@ function GetSingularChildTableName()
 						<IGetMethod ObjectType="405" CSAOCaption="TCSAOExternalSourceWrapperFactory">
 							<Language/>
 							<Method>PERRelation_Variable.GetSingularChildTableName</Method>
+						</IGetMethod>
+					</GetMethod>
+					<SetMethod/>
+				</IExternalProperty>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{A9EF8414-B385-4FBB-8F32-C2A6DF260FBF}</Id>
+					<Name>SingularParentTableCaption</Name>
+					<Attributes/>
+					<Caption>Singular Parent Table Caption</Caption>
+					<DataType>String</DataType>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod>
+						<IGetMethod ObjectType="405" CSAOCaption="TCSAOExternalSourceWrapperFactory">
+							<Language/>
+							<Method>PERRelation_Variable.GetSingularParentTableCaption</Method>
 						</IGetMethod>
 					</GetMethod>
 					<SetMethod/>
