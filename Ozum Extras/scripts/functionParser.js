@@ -48,31 +48,42 @@ var SKIP = {
 
 function _updateFrom(item, parsed) {
   var model = toad.getModel();
-  var schema =
-    model.schemas.getObjectByName(parsed.schema) ||
-    model.createNewObject(2024);
+  var schema = null;
 
-  schema.lock();
-  item.lock();
+  if (parsed.schema && parsed.schema !== "") {
+    schema =
+      model.schemas.getObjectByName(parsed.schema) ||
+      model.createNewObject(2024);
 
-  if (schema.name !== parsed.schema)
-    schema.name = parsed.schema;
+    schema.lock();
 
-  item.schema = schema;
+    if (schema.name !== parsed.schema)
+      schema.name = parsed.schema;
+
+    item.lock();
+    item.schema = schema;
+  } else {
+    item.lock();
+    item.schema = null;
+  }
+
   item.generateSQLOnly = false;
-
+  
   for (var key in parsed) {
     if (!(SKIP[key] === "ALL" || SKIP[key] === parsed.type)) {
       try {
         item[key] = parsed[key];
       } catch (e) {
-        toad.getLog().error("Failed to set property '" + key + "' on item '" + item.fullName + "'");
+        toad.getLog().error(
+          "Failed to set property '" + key + "' on item '" + item.fullName + "'"
+        );
       }
     }
   }
 
   item.unlock();
-  schema.unlock();
+  if (schema)
+    schema.unlock();
 }
 
 
