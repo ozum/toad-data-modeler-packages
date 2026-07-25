@@ -1,0 +1,597 @@
+﻿<?xml version="1.0"?>
+<Package ObjectType="106" CSAOName="Package" CSAOCaption="TPackageFactory" Version="1.30">
+	<Id>{4575491E-BF3B-4542-825A-689D41A9AFAB}</Id>
+	<Name>PostgreSQL Index Nulls Distinct</Name>
+	<Ordinal>0</Ordinal>
+	<GlobalOrder>0</GlobalOrder>
+	<Description/>
+	<Version>1.3</Version>
+	<Basic>0</Basic>
+	<DontLoad>0</DontLoad>
+	<System>0</System>
+	<AutoIncrementVersion>0</AutoIncrementVersion>
+	<Language/>
+	<MultiDBPlatform>0</MultiDBPlatform>
+	<Scripts>
+		<Script ObjectType="105" CSAOName="Script" CSAOCaption="TScriptFactory">
+			<Id>{DFEDDF40-D711-447B-B6A0-51D237D485EE}</Id>
+			<Name>PERCodeGeneratorPG12PG12</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ScriptTypeId>0</ScriptTypeId>
+			<Description/>
+			<History/>
+			<Source>
+<![CDATA[function CreateIndex(index) {
+  var sql = addOptions(index);
+  return sql; 
+}
+
+
+// This function adds "NULLS DISTINCT" to the index.
+function addOptions(index) {
+  var sql = Instance.CreateIndex(index);
+  
+  if (index.nullsNotDistinct) {
+    // sql = sql.replace(/ AS/i, optionsSQL);
+    sql = sql.replace(/\)([ \t\r\n]*);([ \t\r\n]*)$/, ") NULLS NOT DISTINCT$1;$2");  
+  }
+
+
+  return sql;
+}; ]]>
+			</Source>
+			<Author/>
+			<Company/>
+			<Version/>
+			<Abbrev/>
+			<Title/>
+			<Category>0</Category>
+			<Caption/>
+			<Parent>
+				<Id>{8092F38A-5B38-41B0-8B57-6A38AA96AAA9}</Id>
+			</Parent>
+			<Visibilities>
+				<Id>{14A27CE1-B930-4CFC-B4FA-85D201917231}</Id>
+			</Visibilities>
+		</Script>
+	</Scripts>
+	<PartialFormDefs>
+		<PartialFormDefinition ObjectType="102" CSAOName="PartialFormDefinition" CSAOCaption="TPartialFormDefFactory">
+			<Id>{15DE54C6-58B5-44AF-B4A2-C07F76AACABB}</Id>
+			<Name>FmPERIndexEdit</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<FormId>{E2FF0849-A4DA-4FAB-8C09-2A9A1CB82F05}</FormId>
+			<Components>
+				<FmPERIndexEdit ObjectType="520" Modified="Mod">
+					<Id>{4A168FB9-BF39-4E05-8DFE-D84D6278C102}</Id>
+					<Name>FmPERIndexEdit</Name>
+					<ObjectExists>1</ObjectExists>
+					<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+					<Components>
+						<PaBottom ObjectType="532" Modified="Mod">
+							<Id>{7EFF6DBC-B48A-45D1-B514-D1497B00F6CF}</Id>
+							<Name>PaBottom</Name>
+							<ObjectExists>1</ObjectExists>
+							<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+							<Components>
+								<PaButtons ObjectType="532" Modified="Mod">
+									<Id>{BB88CED7-148F-4D2F-BBCC-30BA7146BE44}</Id>
+									<Name>PaButtons</Name>
+									<ObjectExists>1</ObjectExists>
+									<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+									<Components>
+										<BbApply ObjectType="501" Modified="Mod">
+											<Id>{2455F4ED-3C1B-4A1A-BD71-1A0F74AD064F}</Id>
+											<Name>BbApply</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+											<Enabled>0</Enabled>
+											<Owner>FmPERIndexEdit.PaBottom.PaButtons</Owner>
+										</BbApply>
+									</Components>
+									<Left>178</Left>
+									<Owner>FmPERIndexEdit.PaBottom</Owner>
+								</PaButtons>
+							</Components>
+							<Top>530</Top>
+							<Width>543</Width>
+							<Owner>FmPERIndexEdit</Owner>
+						</PaBottom>
+						<PaBottomItems ObjectType="532" Modified="Mod">
+							<Id>{C2126F3A-E962-4201-BE0A-D239B98434D2}</Id>
+							<Name>PaBottomItems</Name>
+							<ObjectExists>1</ObjectExists>
+							<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+							<Top>530</Top>
+							<Width>543</Width>
+							<Owner>FmPERIndexEdit</Owner>
+						</PaBottomItems>
+						<PaCenter ObjectType="532" Modified="Mod">
+							<Id>{02F87864-9FBA-45E8-B5AD-902BC80103B8}</Id>
+							<Name>PaCenter</Name>
+							<ObjectExists>1</ObjectExists>
+							<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+							<Components>
+								<PcGeneral ObjectType="530" Modified="Mod">
+									<Id>{2DB8D062-17A9-4440-917D-5873FF076503}</Id>
+									<Name>PcGeneral</Name>
+									<ObjectExists>1</ObjectExists>
+									<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+									<Components>
+										<TSForeignIndexItems ObjectType="541" Modified="Mod">
+											<Id>{B3BA7E6E-3EB9-4652-B5C2-7F50008678F4}</Id>
+											<Name>TSForeignIndexItems</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+											<Components/>
+											<Left>3</Left>
+											<Top>23</Top>
+											<Width>528</Width>
+											<Height>431</Height>
+											<Caption>
+<![CDATA[Items]]>
+											</Caption>
+											<TabVisible>0</TabVisible>
+											<Owner>FmPERIndexEdit.PaCenter.PcGeneral</Owner>
+										</TSForeignIndexItems>
+										<TsGeneral ObjectType="541" Modified="Mod">
+											<Id>{DFC6C8B2-3A1D-43A2-9CF0-C6F944E5AD12}</Id>
+											<Name>TsGeneral</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+											<Components>
+												<BtNameCaption ObjectType="501" Modified="Mod">
+													<Id>{8A49F597-6545-42A9-BF6E-19447D992207}</Id>
+													<Name>BtNameCaption</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Enabled>0</Enabled>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+												</BtNameCaption>
+												<ChUnique ObjectType="522" Modified="Mod">
+													<Id>{4596BBE2-643B-4C17-BED8-4823057E34BB}</Id>
+													<Name>ChUnique</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Checked>1</Checked>
+													<State>cbChecked</State>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+												</ChUnique>
+												<DCbIndexTablespace ObjectType="559" Modified="Mod">
+													<Id>{657C75D2-13D2-426D-85F2-65BA6EBC90DF}</Id>
+													<Name>DCbIndexTablespace</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Height>20</Height>
+													<ItemHeight>13</ItemHeight>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+												</DCbIndexTablespace>
+												<distinctNulls ObjectType="511">
+													<Id>{1EEA19E7-728D-4842-A9CC-CA7F06EC057C}</Id>
+													<Name>distinctNulls</Name>
+													<ObjectExists>0</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<DeleteAble>1</DeleteAble>
+													<Left>78</Left>
+													<Top>89</Top>
+													<Width>121</Width>
+													<Height>15</Height>
+													<Visible>1</Visible>
+													<Hint/>
+													<AutoEnableProperty/>
+													<TabOrder>12</TabOrder>
+													<TabStop>1</TabStop>
+													<Alignment>taRightJustify</Alignment>
+													<AllowGrayed>0</AllowGrayed>
+													<Anchors>
+														<Item>left#-1</Item>
+														<Item>top#-1</Item>
+														<Item>right#0</Item>
+														<Item>bottom#0</Item>
+													</Anchors>
+													<ShowHint>1</ShowHint>
+													<Caption>Nulls Not Distinct</Caption>
+													<WordWrap>0</WordWrap>
+													<StoreDirectly>1</StoreDirectly>
+													<DataField>nullsNotDistinct</DataField>
+													<DataSource>Index</DataSource>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+												</distinctNulls>
+												<DSbIndexIxAccess ObjectType="504" Modified="Mod">
+													<Id>{225D8071-1738-4BD9-90CD-E8A660BD32FC}</Id>
+													<Name>DSbIndexIxAccess</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Height>20</Height>
+													<ItemHeight>13</ItemHeight>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+												</DSbIndexIxAccess>
+												<EdCaption ObjectType="518" Modified="Mod">
+													<Id>{C43FB690-C27B-4CF6-811F-1272FA85E7DB}</Id>
+													<Name>EdCaption</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Text>
+<![CDATA[IX_<%OwnerName%>_unique_record]]>
+													</Text>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+												</EdCaption>
+												<EdName ObjectType="518" Modified="Mod">
+													<Id>{910E2082-88D5-44B8-A2AB-69F1B952B089}</Id>
+													<Name>EdName</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Text>
+<![CDATA[IX_<%OwnerName%>_unique_record]]>
+													</Text>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+												</EdName>
+												<PaGeneralBottom ObjectType="532" Modified="Mod">
+													<Id>{39BC965C-C594-4392-A655-4FF835026D7F}</Id>
+													<Name>PaGeneralBottom</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Components>
+														<ChGenerate ObjectType="522" Modified="Mod">
+															<Id>{4231CBDF-4940-4C9E-9B83-F774ECE55578}</Id>
+															<Name>ChGenerate</Name>
+															<ObjectExists>1</ObjectExists>
+															<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+															<Checked>1</Checked>
+															<State>cbChecked</State>
+															<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsGeneral.PaGeneralBottom</Owner>
+														</ChGenerate>
+													</Components>
+													<Top>400</Top>
+													<Width>528</Width>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsGeneral</Owner>
+												</PaGeneralBottom>
+											</Components>
+											<Left>3</Left>
+											<Top>23</Top>
+											<Width>528</Width>
+											<Height>431</Height>
+											<Caption>
+<![CDATA[General]]>
+											</Caption>
+											<Owner>FmPERIndexEdit.PaCenter.PcGeneral</Owner>
+										</TsGeneral>
+										<TsIndexComment ObjectType="541" Modified="Mod">
+											<Id>{942F6C52-8FA0-4973-A9E9-4EB49F054CC8}</Id>
+											<Name>TsIndexComment</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+											<Components/>
+											<Left>3</Left>
+											<Top>23</Top>
+											<Width>528</Width>
+											<Height>431</Height>
+											<Owner>FmPERIndexEdit.PaCenter.PcGeneral</Owner>
+										</TsIndexComment>
+										<TsItems ObjectType="541" Modified="Mod">
+											<Id>{4FB21FCB-D317-459E-8D18-4C57CA0B447F}</Id>
+											<Name>TsItems</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+											<Components>
+												<PaAvailableKeyItems ObjectType="532" Modified="Mod">
+													<Id>{4E011808-45F4-41A5-8C4E-69204F9D4AF4}</Id>
+													<Name>PaAvailableKeyItems</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Components>
+														<GrAvailableIndexItems ObjectType="544" Modified="Mod">
+															<Id>{DC678E62-C467-440D-AD88-612A853C0ECA}</Id>
+															<Name>GrAvailableIndexItems</Name>
+															<ObjectExists>1</ObjectExists>
+															<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+															<Height>360</Height>
+															<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsItems.PaAvailableKeyItems</Owner>
+														</GrAvailableIndexItems>
+													</Components>
+													<Height>360</Height>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsItems</Owner>
+												</PaAvailableKeyItems>
+												<PaCenterButtons ObjectType="532" Modified="Mod">
+													<Id>{82C426CC-1294-4052-A2F7-F1492F6ED0B7}</Id>
+													<Name>PaCenterButtons</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Components/>
+													<Left>217</Left>
+													<Height>360</Height>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsItems</Owner>
+												</PaCenterButtons>
+												<PaItemsBottom ObjectType="532" Modified="Mod">
+													<Id>{805D9DF1-14D7-4B2A-A0B9-66E8CC1E4A1D}</Id>
+													<Name>PaItemsBottom</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Components>
+														<EdExpression ObjectType="518" Modified="Mod">
+															<Id>{45C3EE1D-B3BE-4F2C-B9C7-75AE575E15AA}</Id>
+															<Name>EdExpression</Name>
+															<ObjectExists>1</ObjectExists>
+															<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+															<Enabled>0</Enabled>
+															<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsItems.PaItemsBottom</Owner>
+														</EdExpression>
+														<LaExpression ObjectType="523" Modified="Mod">
+															<Id>{6C8C8CB9-3348-4196-A370-3D93349D948F}</Id>
+															<Name>LaExpression</Name>
+															<ObjectExists>1</ObjectExists>
+															<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+															<Enabled>0</Enabled>
+															<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsItems.PaItemsBottom</Owner>
+														</LaExpression>
+													</Components>
+													<Top>385</Top>
+													<Width>528</Width>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsItems</Owner>
+												</PaItemsBottom>
+												<PaItemsTop ObjectType="532" Modified="Mod">
+													<Id>{A078875A-0F12-4FDC-AC2A-62E9E4E8473A}</Id>
+													<Name>PaItemsTop</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Components/>
+													<Width>528</Width>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsItems</Owner>
+												</PaItemsTop>
+												<PaKeyItems ObjectType="532" Modified="Mod">
+													<Id>{BE892FC1-4E33-41B1-BB24-AFFC0C0C413E}</Id>
+													<Name>PaKeyItems</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Components>
+														<GrSelectedIndexItems ObjectType="544" Modified="Mod">
+															<Id>{21B7E28D-72D4-492E-87E8-BB039DCC714B}</Id>
+															<Name>GrSelectedIndexItems</Name>
+															<ObjectExists>1</ObjectExists>
+															<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+															<Width>216</Width>
+															<Height>360</Height>
+															<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsItems.PaKeyItems</Owner>
+														</GrSelectedIndexItems>
+													</Components>
+													<Left>277</Left>
+													<Width>216</Width>
+													<Height>360</Height>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsItems</Owner>
+												</PaKeyItems>
+												<PaRightButtons ObjectType="532" Modified="Mod">
+													<Id>{E36F478D-3EA0-40B9-BEE6-08B7E6CDEC5C}</Id>
+													<Name>PaRightButtons</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Components/>
+													<Left>493</Left>
+													<Height>360</Height>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsItems</Owner>
+												</PaRightButtons>
+												<SpAvailableItems ObjectType="507" Modified="Mod">
+													<Id>{6DE83CA4-62C1-4AF5-AC3E-ABEBA58621DC}</Id>
+													<Name>SpAvailableItems</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Left>271</Left>
+													<Height>360</Height>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsItems</Owner>
+												</SpAvailableItems>
+											</Components>
+											<Left>3</Left>
+											<Top>23</Top>
+											<Width>528</Width>
+											<Height>431</Height>
+											<Caption>
+<![CDATA[Items]]>
+											</Caption>
+											<Owner>FmPERIndexEdit.PaCenter.PcGeneral</Owner>
+										</TsItems>
+										<TsNotes ObjectType="541" Modified="Mod">
+											<Id>{103B9210-1442-4BB5-AEE8-8DDA74AD4209}</Id>
+											<Name>TsNotes</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+											<Components/>
+											<Left>3</Left>
+											<Top>23</Top>
+											<Width>528</Width>
+											<Height>431</Height>
+											<Caption>
+<![CDATA[Notes]]>
+											</Caption>
+											<Owner>FmPERIndexEdit.PaCenter.PcGeneral</Owner>
+										</TsNotes>
+										<TsSQLPreview ObjectType="541" Modified="Mod">
+											<Id>{B2694929-FE4E-4D60-AD7B-1CD4139E210B}</Id>
+											<Name>TsSQLPreview</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+											<Components/>
+											<Left>3</Left>
+											<Top>23</Top>
+											<Width>528</Width>
+											<Height>431</Height>
+											<Owner>FmPERIndexEdit.PaCenter.PcGeneral</Owner>
+										</TsSQLPreview>
+										<TsStorageParameters ObjectType="541" Modified="Mod">
+											<Id>{0F38040A-C0DD-4D23-B9C5-E67E322C8687}</Id>
+											<Name>TsStorageParameters</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+											<Components>
+												<DSbIndexBuffering ObjectType="504" Modified="Mod">
+													<Id>{9FA26001-C883-473F-A961-4243431A3A4E}</Id>
+													<Name>DSbIndexBuffering</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Height>20</Height>
+													<ItemHeight>13</ItemHeight>
+													<Owner>FmPERIndexEdit.PaCenter.PcGeneral.TsStorageParameters</Owner>
+												</DSbIndexBuffering>
+											</Components>
+											<Left>3</Left>
+											<Top>23</Top>
+											<Width>528</Width>
+											<Height>431</Height>
+											<Owner>FmPERIndexEdit.PaCenter.PcGeneral</Owner>
+										</TsStorageParameters>
+									</Components>
+									<Left>4</Left>
+									<Top>4</Top>
+									<Width>535</Width>
+									<Height>457</Height>
+									<Owner>FmPERIndexEdit.PaCenter</Owner>
+								</PcGeneral>
+							</Components>
+							<Width>543</Width>
+							<Height>465</Height>
+							<Owner>FmPERIndexEdit</Owner>
+						</PaCenter>
+						<PaTop ObjectType="532" Modified="Mod">
+							<Id>{E9D075BD-3659-4D99-8F86-6FF62D9379DA}</Id>
+							<Name>PaTop</Name>
+							<ObjectExists>1</ObjectExists>
+							<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+							<Components>
+								<CbNavigator ObjectType="559" Modified="Mod">
+									<Id>{A3BADB76-FE7B-4CD2-866B-95B8D407A19B}</Id>
+									<Name>CbNavigator</Name>
+									<ObjectExists>1</ObjectExists>
+									<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+									<Height>20</Height>
+									<Owner>FmPERIndexEdit.PaTop</Owner>
+								</CbNavigator>
+								<PaTitle ObjectType="532" Modified="Mod">
+									<Id>{A22D36FA-C76E-438C-BA3E-3F7411CBB294}</Id>
+									<Name>PaTitle</Name>
+									<ObjectExists>1</ObjectExists>
+									<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+									<Components>
+										<PaTopParent ObjectType="532" Modified="Mod">
+											<Id>{9B3983E4-CA37-423B-B1D9-7FDA58CE6A52}</Id>
+											<Name>PaTopParent</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+											<Components/>
+											<Left>479</Left>
+											<Owner>FmPERIndexEdit.PaTop.PaTitle</Owner>
+										</PaTopParent>
+										<PaTopParentLabel ObjectType="532" Modified="Mod">
+											<Id>{FDA8F279-0624-4CCA-9999-1BE5BA04EA37}</Id>
+											<Name>PaTopParentLabel</Name>
+											<ObjectExists>1</ObjectExists>
+											<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+											<Components>
+												<LaParentObjectName ObjectType="523" Modified="Mod">
+													<Id>{770EBC38-8ECA-463C-B0A2-C8AEFEC47A5D}</Id>
+													<Name>LaParentObjectName</Name>
+													<ObjectExists>1</ObjectExists>
+													<PackageGUID>{4575491E-BF3B-4542-825A-689D41A9AFAB}</PackageGUID>
+													<Width>194</Width>
+													<Height>13</Height>
+													<Caption>
+<![CDATA[Entity: private.operation_emission_gases]]>
+													</Caption>
+													<Owner>FmPERIndexEdit.PaTop.PaTitle.PaTopParentLabel</Owner>
+												</LaParentObjectName>
+											</Components>
+											<Width>479</Width>
+											<Owner>FmPERIndexEdit.PaTop.PaTitle</Owner>
+										</PaTopParentLabel>
+									</Components>
+									<Width>543</Width>
+									<Owner>FmPERIndexEdit.PaTop</Owner>
+								</PaTitle>
+							</Components>
+							<Width>543</Width>
+							<Owner>FmPERIndexEdit</Owner>
+						</PaTop>
+					</Components>
+					<Caption>
+<![CDATA[Index Properties]]>
+					</Caption>
+					<Owner/>
+				</FmPERIndexEdit>
+			</Components>
+		</PartialFormDefinition>
+	</PartialFormDefs>
+	<Extensions>
+		<Id>{3024A445-2DF4-4946-8F66-7E165D07D973}</Id>
+	</Extensions>
+	<ExtCSAOClassDefs>
+		<ExternalClass ObjectType="103" CSAOName="ExternalClass" CSAOCaption="TExtCSAOClassDefFactory">
+			<Id>{422FCAE2-9875-4ACD-83C3-79E1CCD5CB88}</Id>
+			<Name>PERCodeGeneratorPG12PG12</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ParentFactoryName/>
+			<ParentClassType>0</ParentClassType>
+			<DefaultName/>
+			<CSAOObjectType>2027</CSAOObjectType>
+			<Abstract>0</Abstract>
+			<CSAOClassCaption/>
+			<Members>
+				<IExternalFunction ObjectType="403" CSAOCaption="TCSAOExtFunctionWrapperFactory">
+					<Id>{7AF626EE-1AFF-4B5B-AC1D-DC722BC20593}</Id>
+					<Name>CreateIndex</Name>
+					<Parameters>
+						<IParameter ObjectType="410" CSAOCaption="TCSAOParamDefWrapperFactory">
+							<Name>Index</Name>
+							<Id>{00000000-0000-0000-0000-000000000000}</Id>
+							<DataType>Dispatch</DataType>
+						</IParameter>
+					</Parameters>
+					<Method>
+						<IMethod ObjectType="407" CSAOCaption="TCSAOExternalSourceWrapperFactory">
+							<Language/>
+							<Method>PERCodeGeneratorPG12PG12.CreateIndex</Method>
+						</IMethod>
+					</Method>
+					<Result>
+						<IResult ObjectType="411" CSAOCaption="TCSAOParamDefWrapperFactory">
+							<Name/>
+							<Id>{00000000-0000-0000-0000-000000000000}</Id>
+							<DataType>String</DataType>
+						</IResult>
+					</Result>
+				</IExternalFunction>
+			</Members>
+		</ExternalClass>
+		<ExternalClass ObjectType="103" CSAOName="ExternalClass" CSAOCaption="TExtCSAOClassDefFactory">
+			<Id>{8888C708-BD74-4761-A134-F4F5F1BE8EFE}</Id>
+			<Name>PERIndexPG12</Name>
+			<Ordinal>0</Ordinal>
+			<GlobalOrder>0</GlobalOrder>
+			<ParentFactoryName/>
+			<ParentClassType>0</ParentClassType>
+			<DefaultName/>
+			<CSAOObjectType>2012</CSAOObjectType>
+			<Abstract>0</Abstract>
+			<CSAOClassCaption/>
+			<Members>
+				<IExternalProperty ObjectType="401" CSAOCaption="TCSAOExtPropertyWrapperFactory">
+					<Id>{5CADE4AB-5BFE-4A55-8B22-585BF8A443D1}</Id>
+					<Name>nullsNotDistinct</Name>
+					<Attributes>
+						<Item>1</Item>
+						<Item>3</Item>
+					</Attributes>
+					<Caption>nullsNotDistinct</Caption>
+					<DataType>Boolean</DataType>
+					<TemplateLinksId>{00000000-0000-0000-0000-000000000000}</TemplateLinksId>
+					<Redefine>0</Redefine>
+					<GetMethod/>
+					<SetMethod/>
+				</IExternalProperty>
+			</Members>
+		</ExternalClass>
+	</ExtCSAOClassDefs>
+	<VisibilityDefinition/>
+	<Visibilities>
+		<Id>{5EA30D67-3CA2-4A7D-922F-9DA261691A0A}</Id>
+	</Visibilities>
+</Package>
